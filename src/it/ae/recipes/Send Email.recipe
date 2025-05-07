@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Recipe name="Send Email">
+	<Var name="mimeType" type="array">
+		<item>text/plain</item> 
+		<item>text/html</item> 
+		<item>eml</item> 
+	</Var> 
+	<Var name="mimeType" init="console,mandatory" /> 
+	<If name="mimeType" equals="eml">
+		<Load name="email_body" init="console,mandatory" mode="bytes" /> 
+		<Var name="mimeType" value="" /> 
+		<Var name="email_address" init="console" /> 
+		<Else>
+			<Load name="email_body" init="console,mandatory" /> 
+			<Var name="email_address" init="mandatory" /> 
+		</Else> 
+	</If> 
+	<Var name="smtp_login" init="console,mandatory" /> 
+	<Var name="smtp_password" init="console,mandatory" type="password" /> 
+	<Extern class="com.ganteater.ae.desktop.processor.Mail">
+		<Send
+		ssl="true"
+		username="$var{smtp_login}"
+		password="$var{smtp_password}"
+		host="smtp.gmail.com"
+		port="465"
+		body="email_body"
+		mimeType="$var{mimeType}">
+			<recipient address="$var{email_address}" /> 
+			<recipient type="CC" /> 
+			<recipient type="BCC" /> 
+		</Send> 
+	</Extern> 
+</Recipe> 
