@@ -17,7 +17,7 @@
 	</If> 
 	<Var name="smtp_login" init="console,mandatory" /> 
 	<Var name="smtp_password" init="console,mandatory" type="password" /> 
-	<Extern class="com.ganteater.ae.desktop.processor.Mail">
+	<Extern class="Mail">
 		<Send
 		ssl="true"
 		username="$var{smtp_login}"
