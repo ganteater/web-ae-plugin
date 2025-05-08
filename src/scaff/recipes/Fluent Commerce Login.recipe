@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Recipe name="Fluent Commerce Login">
+	<Task name="My Applications Login" level="debug" /> 
+	<Extern tab="ms" class="com.ganteater.ae.processor.Web" timeout="8000">
+		<Click xpath="//*[contains(text(),'Fluent PRD')]" tab="fc" /> 
+	</Extern> 
+	<Extern tab="fc" class="com.ganteater.ae.processor.Web" timeout="8000">
+		<GetText xpath="//span[contains(text(), 'Overview Dashboard')]" /> 
+		<GetUrl name="url" /> 
+		<Out name="url" type="url" /> 
+	</Extern> 
+</Recipe> 

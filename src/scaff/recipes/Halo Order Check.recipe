@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Recipe name="Halo Order Check">
+	<Var name="Order Number" init="mandatory" /> 
+	<Extern tab="halo" class="com.ganteater.ae.processor.Web" timeout="2000">
+		<Page url="$var{Halo Url}/tickets" /> 
+		<ElementExists id="Username">
+			<Task name="Open Halo" /> 
+		</ElementExists> 
+		<Page url="$var{Halo Url}/tickets" /> 
+		<Click xpath="//*[@id='halo-nav']/div[1]/div[2]/div[1]/div" /> 
+		<Text xpath="//*[@id='react-select-navSearchBar--value']/div[2]/input" value="$var{Order Number}" /> 
+		<Click xpath="//*[@id='react-select-navSearchBar--option-0']" timeout="6000" /> 
+		<Remove name="Summary" /> 
+		<ElementExists xpath="//*[@id='tickethistoryscroll']/div/div/div[1]/div[2]/div/div[3]/div/div[1]/div/div/div/div/div/div/div">
+			<GetText name="Summary" xpath="//*[@id='tickethistoryscroll']/div/div/div[1]/div[2]/div/div[3]/div/div[1]/div/div/div/div/div/div/div" /> 
+			<Out name="Summary" /> 
+		</ElementExists> 
+	</Extern> 
+</Recipe> 

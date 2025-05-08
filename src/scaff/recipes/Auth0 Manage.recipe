@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Recipe name="Auth0 Manage">
+	<Var name="Auth0 Project" init="mandatory" /> 
+	<Task name="My Applications Login" level="debug" /> 
+	<Extern tab="ms" class="com.ganteater.ae.processor.Web" timeout="6000">
+		<Click xpath="//div[text()='Auth0 (Dashboard)']" tab="a0" /> 
+	</Extern> 
+	<Extern tab="a0" class="com.ganteater.ae.processor.Web" timeout="6000">
+		<Page url="https://manage.auth0.com/dashboard/eu/$var{Auth0 Project}/organizations" /> 
+		<GetUrl name="url" /> 
+		<Out name="url" type="url" /> 
+	</Extern> 
+</Recipe> 

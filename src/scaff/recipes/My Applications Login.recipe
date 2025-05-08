@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Recipe name="My Applications Login">
+	<Extern tab="ms" class="com.ganteater.ae.processor.Web" timeout="8000">
+		<Page url="https://myapplications.microsoft.com/" /> 
+		<Wait delay="2000" /> 
+		<ElementExists name="loginfmt" timeout="500">
+			<Var name="MS Login" init="mandatory" /> 
+			<Var name="MS Password" init="mandatory" type="password" /> 
+			<Text name="loginfmt" value="$var{MS Login}" /> 
+			<Click id="idSIButton9" /> 
+			<Wait delay="2000" /> 
+			<Text name="passwd" value="$var{MS Password}" /> 
+			<Wait delay="2000" /> 
+			<Click id="idSIButton9" /> 
+			<Remove name="DisplaySign" /> 
+			<GetText name="DisplaySign" xpath="//*[@id='idRichContext_DisplaySign']" exception="ignored" /> 
+			<If isNotNull="DisplaySign">
+				<Else>
+					<Confirm message="Please complete the authentication process and click OK." /> 
+				</Else> 
+				<WhileRun message="Please approve sign in request to continue.$var{\n}Code: $var{DisplaySign}">
+					<Click id="KmsiCheckboxField" timeout="60000" /> 
+					<Click id="idSIButton9" /> 
+				</WhileRun> 
+			</If> 
+		</ElementExists> 
+		<Click xpath="//*[contains(@id,'ModalFocusTrapZone')]/div[2]/div/div[1]/div[2]/button" exception="ignored" timeout="50" /> 
+		<Click xpath="//span[text()='Apps']" exception="ignored" timeout="1000" /> 
+		<GetUrl name="url" /> 
+		<Out name="url" type="url" /> 
+	</Extern> 
+</Recipe> 

@@ -11,13 +11,17 @@ import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.io.IOUtils;
@@ -30,15 +34,16 @@ import org.jsoup.select.Elements;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import com.ganteater.ae.processor.annotation.CommandExamples;
 import com.ganteater.ae.processor.annotation.CommandHotHepl;
 import com.ganteater.ae.util.xml.easyparser.EasyParser;
 import com.ganteater.ae.util.xml.easyparser.Node;
 
-public class DocumentParser extends TaskProcessor {
+public class DocumentParser extends BaseProcessor {
 
-	public DocumentParser(TaskProcessor aParent) {
+	public DocumentParser(Processor aParent) {
 		super(aParent);
 	}
 
@@ -61,10 +66,13 @@ public class DocumentParser extends TaskProcessor {
 		setVariableValue(name, result);
 	}
 
+	@SuppressWarnings("unchecked")
 	@CommandHotHepl("<html></html>")
 	@CommandExamples({ "<Extract name='type:property' source='type:property' xpath='type:string' />",
 			"<Extract name='type:property' source='type:property' selector='type:string' />" })
-	public void runCommandExtract(final Node aCurrentAction) throws Exception {
+	public void runCommandExtract(final Node aCurrentAction)
+			throws ParserConfigurationException, SAXException, IOException, XPathExpressionException,
+			TransformerFactoryConfigurationError, TransformerException {
 		final String theNameAttribut = replaceProperties(aCurrentAction.getAttribute("name"));
 		String theNodeAttribut = replaceProperties(aCurrentAction.getAttribute("xpath"));
 		final String theSourceAttribut = replaceProperties(aCurrentAction.getAttribute("source"));
@@ -166,7 +174,7 @@ public class DocumentParser extends TaskProcessor {
 	}
 
 	@CommandExamples({ "<PageParser url=''><select name='type:property'>...jsop_select...</select></PageParser>" })
-	public void runCommandPageParser(Node action) throws URISyntaxException, IOException {
+	public void runCommandPageParser(Node action) throws IOException {
 		String url = attr(action, "url");
 		int timeout = Integer.parseInt(attr(action, "timeout", "2000"));
 		Connection connect = Jsoup.connect(url)

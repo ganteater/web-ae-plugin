@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Recipe name="Salesforce Marketing Cloud">
+	<Task name="My Applications Login" level="debug" /> 
+	<Extern tab="ms" class="com.ganteater.ae.processor.Web" timeout="8000">
+		<Click xpath="/html/body/div/div[2]/div[1]/div/div/div[2]/div[2]/div/div/div/div/input" /> 
+		<Text xpath="/html/body/div/div[2]/div[1]/div/div/div[2]/div[2]/div/div/div/div/input" value="Salesforce$var{\n}" /> 
+		<Click xpath="//*[@id='root']/div[2]/div[1]/div/div/div[2]/div[2]/div/div/div/div[2]/div/div[2]/div/div/div/div/a/div/strong" tab="sf" /> 
+	</Extern> 
+	<Extern tab="sf" class="com.ganteater.ae.processor.Web" type="chrome" timeout="6000">
+		<Page url="https://mc.s7.exacttarget.com/" /> 
+		<Wait delay="5000" /> 
+		<Page url="https://mc.s7.exacttarget.com/cloud/#app/Email" /> 
+		<Wait delay="5000" /> 
+		<Click>
+			<xpath>//*[@id="body"]/div/div[1]/div/nav[1]/div/div/div[2]/div/div[3]/div/ul/li[1]/a</xpath> 
+		</Click> 
+		<Wait delay="1500" /> 
+		<Click>
+			<xpath>//*[@id="body"]/div/div[1]/div/nav[1]/div/div/div[2]/div/div[3]/div/ul/li[2]/ul/li[1]/a</xpath> 
+		</Click> 
+		<GetUrl name="url" /> 
+		<Out name="url" type="url" /> 
+	</Extern> 
+</Recipe> 

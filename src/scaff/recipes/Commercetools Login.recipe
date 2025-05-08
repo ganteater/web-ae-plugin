@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Recipe name="Commercetools Login">
+	<Var name="CT Login SSO" init="mandatory" /> 
+	<Var name="CT Account" init="mandatory" /> 
+	<Task name="My Applications Login" level="debug" /> 
+	<Extern tab="ms" class="com.ganteater.ae.processor.Web" timeout="6000">
+		<Click xpath="//div[text()='CommerceTools']" tab="ct" /> 
+	</Extern> 
+	<Extern tab="ct" class="com.ganteater.ae.processor.Web" type="chrome" drivers="$var{web.drivers.dir}" timeout="4000">
+		<Wait delay="1000" /> 
+		<Page url="https://mc.europe-west1.gcp.commercetools.com/login/sso/$var{CT Login SSO}" /> 
+		<Click xpath="//*[@id='portals-container']/div[3]/div/div[2]/div[1]/span/div/div/div/div/div[1]/span/button" timeout="2000" exception="ignored" /> 
+		<Wait delay="3000" /> 
+		<Page url="https://mc.europe-west1.gcp.commercetools.com/$var{CT Account}/welcome" /> 
+		<GetUrl name="url" /> 
+		<Out name="url" type="url" /> 
+	</Extern> 
+</Recipe> 

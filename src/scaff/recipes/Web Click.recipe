@@ -1,0 +1,9 @@
+<Recipe name="Web Click">
+  <Extern tab="w" class="Web">
+    <Page url="https://duckduckgo.com/" /> 
+    <Text value="Anteater" name="q" /> 
+    <Click xpath="//button[@type='submit']" tab="rst" /> 
+    <Page url="https://sourceforge.net/p/anteater/wiki" /> 
+  </Extern> 
+  <Extern tab="rst" class="com.ganteater.ae.processor.Web" /> 
+</Recipe> 

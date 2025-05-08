@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Recipe name="Open Halo">
+	<Var name="Halo Url" init="mandatory" /> 
+	<Extern tab="halo" class="com.ganteater.ae.processor.Web" timeout="4000">
+		<ElementNotExists xpath="//*[@id='profile-button']/button/div/div/div[1]">
+			<Page url="$var{Halo Url}/tickets" /> 
+			<ElementExists id="Username">
+				<Var name="Halo Username" init="mandatory" /> 
+				<If isNotNull="Halo Username">
+					<Else>
+						<Confirm message="Please login into Halo manually.">
+							<Out>Halo login skipped.</Out> 
+						</Confirm> 
+					</Else> 
+					<Text id="Username" value="$var{Halo Username}" /> 
+					<Var name="Halo Password" init="mandatory" type="password" /> 
+					<Text id="Password" value="$var{Halo Password}" /> 
+					<Click xpath="/html/body/div/div/div[2]/form[1]/div/div[2]/button" /> 
+					<Wait delay="500" /> 
+				</If> 
+			</ElementExists> 
+		</ElementNotExists> 
+		<ElementNotExists xpath="//*[@id='app-container']/div/div/div[2]/div[2]/div[3]/div/div/div[3]/div/div[3]/div/div[1]/div/div[2]/div[1]/div/div/div[1]/div/div[2]/div[1]/h1">
+			<Click xpath="//*[@id='halo-tree']/div[2]/div/div/div/ul/li[1]/div[1]/div/div/div[1]/div" exception="ignored" /> 
+			<Var name="name" source="USER_NAME" /> 
+			<Replace name="name" oldChar="_" newChar=" " /> 
+			<Click exception="ignored">
+				<xpath>//*[text()='$var{name} (You)']</xpath> 
+			</Click> 
+		</ElementNotExists> 
+		<GetUrl name="url" /> 
+		<Out name="url" type="url" /> 
+	</Extern> 
+</Recipe> 

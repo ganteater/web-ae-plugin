@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Recipe name="Login All">
+	<Choice name="Logins" mode="table" type="call-task" exception="ignored">
+		<Task name="My Applications Login" /> 
+		<Task name="AWS Login" /> 
+		<Task name="Open Halo" /> 
+		<Task name="Commercetools Login" /> 
+		<Task name="Fluent Commerce Login" /> 
+		<Task name="Auth0 Manage" /> 
+		<Task name="Open Teams" /> 
+		<Task name="Salesforce Marketing Cloud" /> 
+	</Choice> 
+</Recipe> 

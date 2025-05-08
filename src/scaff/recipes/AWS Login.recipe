@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Recipe name="AWS Login">
+	<Task name="My Applications Login" level="debug" /> 
+	<Extern tab="ms" class="com.ganteater.ae.processor.Web" timeout="8000">
+		<Click xpath="//div[text()='AWS']" tab="aws" /> 
+	</Extern> 
+	<Extern tab="aws" class="com.ganteater.ae.processor.Web" timeout="8000">
+		<ElementExists xpath="/html/body/app/portal-ui/div/div/portal-topbar/centered-content/a/img" /> 
+		<GetUrl name="url" /> 
+		<Out name="url" type="url" /> 
+	</Extern> 
+</Recipe> 

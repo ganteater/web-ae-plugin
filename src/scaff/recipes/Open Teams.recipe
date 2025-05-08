@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Recipe name="Open Teams">
+	<Task name="My Applications Login" level="debug" /> 
+	<Extern tab="ms" class="com.ganteater.ae.processor.Web" timeout="8000">
+		<Click xpath="/html/body/div/div[2]/div[1]/div/div/div[2]/div[2]/div/div/div/div/input" /> 
+		<Text xpath="/html/body/div/div[2]/div[1]/div/div/div[2]/div[2]/div/div/div/div/input" value="Teams$var{\n}" /> 
+		<Click xpath="//*[@id='root']/div[2]/div[1]/div/div/div[2]/div[2]/div/div/div/div[2]/div/div[2]/div/div/div/div/a/div/strong" tab="tms" /> 
+	</Extern> 
+	<Extern tab="tms" class="com.ganteater.ae.processor.Web">
+		<ElementExists id="control-input" timeout="10000" /> 
+		<GetUrl name="url" /> 
+		<Out name="url" type="url" /> 
+	</Extern> 
+</Recipe> 

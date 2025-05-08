@@ -46,23 +46,28 @@ import com.ganteater.ae.processor.annotation.CommandHotHepl;
 import com.ganteater.ae.util.TestCase;
 import com.ganteater.ae.util.xml.easyparser.Node;
 
-public class Web extends TaskProcessor {
+public class Web extends BaseProcessor {
+
+	private static final String SELECTOR_TARG_LIST = "<xpath>...</xpath><className>...</className><cssSelector>...</cssSelector><id>...</id><linkText>...</linkText><partialLinkText>...</partialLinkText><tagName>...</tagName>";
+	private static final String MSEDGE = "msedge";
+	private static final String GECKO = "gecko";
+	private static final String CHROME = "chrome";
 
 	private static final String PLUGINS_DIR_NAME = "plugins";
 	private static final int SLEEP_INTERVAL = 50;
 	private static final int ALERT_TIMEOUT = 500;
 	private static final String DEFAULT_DRIVER_NAME = "default";
 	private static final String WEB_DRIVER_TYPE_VAR_NAME = "WEB_DRIVER_TYPE";
-	private static final String DEFAULT_DRIVER_TYPE = "chrome";
+	private static final String DEFAULT_DRIVER_TYPE = CHROME;
 
 	private String driverName = DEFAULT_DRIVER_NAME;
 	private long timeout = 1;
 	private Web webParrentProcessor;
 
 	private String type;
-	private static Map<String, String> windowMap;
+	private static Map<String, String> windowMap = new HashMap<>();
 
-	public Web(TaskProcessor aParent) {
+	public Web(Processor aParent) {
 		super(aParent);
 		webParrentProcessor = getWebParrentProcessor();
 		if (webParrentProcessor != null) {
@@ -72,18 +77,18 @@ public class Web extends TaskProcessor {
 	}
 
 	private Web getWebParrentProcessor() {
-		TaskProcessor parent = getParent();
+		Processor parent = getParent();
 		while (parent != null && !(parent instanceof Web)) {
 			parent = parent.getParent();
 		}
-		if (parent != null && parent instanceof Web) {
+		if (parent instanceof Web) {
 			return (Web) parent;
 		}
 		return null;
 	}
 
 	@Override
-	public void init(TaskProcessor aParent, Node action) throws CommandException {
+	public void init(Processor aParent, Node action) throws CommandException {
 		timeout = getTimeout(action);
 		super.init(aParent, action);
 		String name = attr(action, "name");
@@ -98,8 +103,7 @@ public class Web extends TaskProcessor {
 		String tab = attr(action, "tab");
 
 		if (tab != null) {
-			if (windowMap == null) {
-				windowMap = new HashMap<>();
+			if (windowMap.isEmpty()) {
 				String windowId = driver.getWindowHandle();
 				windowMap.put(tab, windowId);
 
@@ -108,18 +112,7 @@ public class Web extends TaskProcessor {
 
 				if (windowId != null) {
 					try {
-						Set<String> windowHandles = driver.getWindowHandles();
-						if (windowHandles.contains(windowId)) {
-							driver.switchTo().window(windowId);
-						} else {
-							try {
-								createTab(driver, tab);
-
-							} catch (NoSuchWindowException e) {
-								e.printStackTrace();
-								createDriver(action);
-							}
-						}
+						createTab(action, driver, tab, windowId);
 					} catch (WebDriverException e) {
 						windowMap.remove(tab);
 						windowId = null;
@@ -146,7 +139,9 @@ public class Web extends TaskProcessor {
 				if (window == null) {
 					quiteDriver();
 				}
-				window.getSize();
+				if (window != null) {
+					window.getSize();
+				}
 			} catch (WebDriverException | NullPointerException e) {
 				log.debug(e);
 				quiteDriver();
@@ -154,10 +149,25 @@ public class Web extends TaskProcessor {
 		}
 	}
 
+	private void createTab(Node action, WebDriver driver, String tab, String windowId) throws CommandException {
+		Set<String> windowHandles = driver.getWindowHandles();
+		if (windowHandles.contains(windowId)) {
+			driver.switchTo().window(windowId);
+		} else {
+			try {
+				createTab(driver, tab);
+
+			} catch (NoSuchWindowException e) {
+				e.printStackTrace();
+				createDriver(action);
+			}
+		}
+	}
+
 	private String createTab(WebDriver driver, String tab) {
 		((JavascriptExecutor) driver).executeScript("window.open()");
 
-		ArrayList<String> tabs = new ArrayList<String>(driver.getWindowHandles());
+		ArrayList<String> tabs = new ArrayList<>(driver.getWindowHandles());
 		String nameOrHandle = tabs.get(tabs.size() - 1);
 		windowMap.put(tab, nameOrHandle);
 
@@ -188,30 +198,7 @@ public class Web extends TaskProcessor {
 				File startDir = new File(getListener().getManager().getFile(PLUGINS_DIR_NAME), driverFileName);
 
 				if (!startDir.exists()) {
-					String downloadPage;
-					switch (driverType) {
-					case "chrome":
-						downloadPage = "https://sites.google.com/chromium.org/driver/downloads";
-						break;
-					case "gecko":
-						downloadPage = "https://github.com/mozilla/geckodriver/releases";
-						break;
-					case "msedge":
-						downloadPage = "https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver";
-						break;
-					default:
-						downloadPage = "https://www.selenium.dev/documentation/webdriver/";
-					}
-
-					File homeWorkingDir = new File(AEWorkspace.getInstance().getHomeWorkingDir(), PLUGINS_DIR_NAME);
-					File baseDir = new File(AEWorkspace.getInstance().getBaseDir(), PLUGINS_DIR_NAME);
-					throw new CommandException("Web driver not found.\n\n"
-							+ "If you know the path to the already loaded web driver, you can use the anteater environment variable: WEBDRIVER_PATH.\n"
-							+ "If you don't have the web driver, you can download it in the following folders:\n"
-							+ "BaseDir: <a href=\"file:" + baseDir + "\">" + baseDir.getAbsolutePath() + "</a>\n"
-							+ "or HomeDir: <a href=\"file:" + homeWorkingDir + "\">" + homeWorkingDir.getAbsolutePath()
-							+ "</a>\n" + "\nWebdriwer download page: <a href=\"" + downloadPage + "\" >" + downloadPage
-							+ "</a>\n" + "After installing the web driver, an application restart is required.", this);
+					showDriverNotFound(driverType);
 				} else {
 					absolutePath = startDir.getAbsolutePath();
 				}
@@ -223,12 +210,12 @@ public class Web extends TaskProcessor {
 
 			WebDriver driver;
 			switch (driverType) {
-			case "gecko":
+			case GECKO:
 				FirefoxOptions profile = new FirefoxOptions();
 				driver = new FirefoxDriver(profile);
 				break;
 
-			case "chrome":
+			case CHROME:
 				ChromeOptions chromeOptions = new ChromeOptions();
 
 				String value = action.getAttribute("deviceName");
@@ -244,7 +231,7 @@ public class Web extends TaskProcessor {
 				driver = new ChromeDriver(chromeOptions);
 				break;
 
-			case "msedge":
+			case MSEDGE:
 				if ("iexplorer".equals(action.getAttribute("mode"))) {
 					EdgeOptions options = new EdgeOptions();
 					driver = new EdgeDriver(options);
@@ -268,7 +255,7 @@ public class Web extends TaskProcessor {
 				String message = org.apache.commons.lang3.StringUtils.substringBefore(e.getMessage(),
 						"remote stacktrace: Backtrace:");
 
-				if ("chrome".equals(driverType)) {
+				if (CHROME.equals(driverType)) {
 					message = message
 							+ "\nTo fix this issue you should download required webdriwer from\n download page: <a href=\"https://sites.google.com/chromium.org/driver/downloads\" >https://sites.google.com/chromium.org/driver/downloads</a>\n"
 							+ "and unpacked to <a href=\"file:" + StringUtils.substringBeforeLast(absolutePath, "\\")
@@ -285,28 +272,52 @@ public class Web extends TaskProcessor {
 		}
 	}
 
+	private void showDriverNotFound(String driverType) throws CommandException {
+		String downloadPage;
+		switch (driverType) {
+		case CHROME:
+			downloadPage = "https://sites.google.com/chromium.org/driver/downloads";
+			break;
+		case GECKO:
+			downloadPage = "https://github.com/mozilla/geckodriver/releases";
+			break;
+		case MSEDGE:
+			downloadPage = "https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver";
+			break;
+		default:
+			downloadPage = "https://www.selenium.dev/documentation/webdriver/";
+		}
+
+		File homeWorkingDir = new File(AEWorkspace.getInstance().getHomeWorkingDir(), PLUGINS_DIR_NAME);
+		File baseDir = new File(AEWorkspace.getInstance().getBaseDir(), PLUGINS_DIR_NAME);
+		throw new CommandException("Web driver not found.\n\n"
+				+ "If you know the path to the already loaded web driver, you can use the anteater environment variable: WEBDRIVER_PATH.\n"
+				+ "If you don't have the web driver, you can download it in the following folders:\n"
+				+ "BaseDir: <a href=\"file:" + baseDir + "\">" + baseDir.getAbsolutePath() + "</a>\n"
+				+ "or HomeDir: <a href=\"file:" + homeWorkingDir + "\">" + homeWorkingDir.getAbsolutePath() + "</a>\n"
+				+ "\nWebdriwer download page: <a href=\"" + downloadPage + "\" >" + downloadPage + "</a>\n"
+				+ "After installing the web driver, an application restart is required.", this);
+	}
+
 	private String getDriverClassName(Node action) {
-		String driverClass = attr(action, "driver");
-		return driverClass;
+		return attr(action, "driver");
 	}
 
 	private String getType(Node action) {
 		String defaultDriverType = getParentDriverType();
-		String driverType = StringUtils.defaultIfBlank(attr(action, "type"), defaultDriverType);
-		return driverType;
+		return StringUtils.defaultIfBlank(attr(action, "type"), defaultDriverType);
 	}
 
 	private String getParentDriverType() {
-		String type = null;
+		String driverType = null;
 		Web parent = getWebParrentProcessor();
 		if (parent != null) {
-			type = parent.getType();
+			driverType = parent.getType();
 		}
-		if (type == null) {
-			type = StringUtils.defaultIfBlank((String) getVariableString(WEB_DRIVER_TYPE_VAR_NAME),
-					DEFAULT_DRIVER_TYPE);
+		if (driverType == null) {
+			driverType = StringUtils.defaultIfBlank(getVariableString(WEB_DRIVER_TYPE_VAR_NAME), DEFAULT_DRIVER_TYPE);
 		}
-		return type;
+		return driverType;
 	}
 
 	private String getType() {
@@ -326,7 +337,7 @@ public class Web extends TaskProcessor {
 					getDriver().switchTo().alert().accept();
 					alertAccepted = true;
 				} catch (Exception e) {
-					// TODO: do nothing
+					log.debug(e);
 				}
 			}
 		}
@@ -336,14 +347,14 @@ public class Web extends TaskProcessor {
 	private void sleep(long millisecond) {
 		try {
 			Thread.sleep(millisecond);
-		} catch (InterruptedException e1) {
-			//
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
 		}
 	}
 
 	@CommandExamples("<RunIfFirst>...</RunIfFirst>")
 	@CommandHotHepl("Will run if this code does not have a parent Web tag. If you need to run when the parent is you can use <Else> inside.")
-	public void runCommandRunIfFirst(Node action) throws CommandException {
+	public void runCommandRunIfFirst(Node action) {
 		try {
 			if (webParrentProcessor == null) {
 				runNodes(new Node[] { action });
@@ -394,25 +405,21 @@ public class Web extends TaskProcessor {
 	}
 
 	@CommandExamples({ "<Text value='' name='type:string' />", "<Text value=''><name>...</name></Text>",
-			"<Text value=''><xpath>...</xpath><className>...</className><cssSelector>...</cssSelector><id>...</id><linkText>...</linkText><partialLinkText>...</partialLinkText><tagName>...</tagName></Text>" })
+			"<Text value=''>" + SELECTOR_TARG_LIST + "</Text>" })
 	@CommandHotHepl("You can use this command for input a text in the field. The field identified by id, name, xpath and other.")
-	public void runCommandText(Node action) throws CommandException {
+	public void runCommandText(Node action) {
 		try {
 			WebElement element = findElementWithTimeout(action, true);
 
 			String text = attr(action, "value");
 
 			if (element != null) {
-				try {
-					element.clear();
-				} catch (Exception e) {
-					//
-				}
+				clearElement(element);
 				element.sendKeys(text);
-			}
 
-			if (StringUtils.equalsIgnoreCase("true", attr(action, "submit"))) {
-				element.submit();
+				if (StringUtils.equalsIgnoreCase("true", attr(action, "submit"))) {
+					element.submit();
+				}
 			}
 
 			return;
@@ -424,8 +431,16 @@ public class Web extends TaskProcessor {
 		updateTabTitle();
 	}
 
+	private void clearElement(WebElement element) {
+		try {
+			element.clear();
+		} catch (Exception e) {
+			//
+		}
+	}
+
 	@CommandExamples({ "<CloseTab name=''/>", "<CloseTab/>" })
-	public void runCommandCloseTab(Node action) throws CommandException {
+	public void runCommandCloseTab(Node action) {
 		String tabName = attr(action, "name");
 		if (tabName != null) {
 			String tabId = windowMap.get(tabName);
@@ -442,65 +457,63 @@ public class Web extends TaskProcessor {
 		updateTabTitle();
 	}
 
-	@CommandExamples({ "<Click xpath=''/>",
-			"<Click><xpath>...</xpath><className>...</className><cssSelector>...</cssSelector><id>...</id><linkText>...</linkText><partialLinkText>...</partialLinkText><tagName>...</tagName></Click>" })
-	public void runCommandClick(Node action) throws CommandException {
+	@CommandExamples({ "<Click xpath=''/>", "<Click>" + SELECTOR_TARG_LIST + "</Click>" })
+	public void runCommandClick(Node action) {
 		Set<String> existedWindowHandles = getDriver().getWindowHandles();
 
 		WebElement element = findElementWithTimeout(action, true);
-
-		WebDriverException exception = null;
-		long timeout = getTimeout(action);
-		for (long i = 0; i < timeout && !isStoppedTest(); i += SLEEP_INTERVAL) {
-			try {
-				element.click();
-				exception = null;
-				break;
-			} catch (WebDriverException e) {
-				exception = e;
-			}
-			sleep(SLEEP_INTERVAL);
-		}
-		checkExceptionState(exception);
-		checkAuthAllert(action, SLEEP_INTERVAL);
-
-		String tabName = attr(action, "tab");
-		if (tabName != null) {
-			String newTabId = getNewTabId(existedWindowHandles);
-
-			String tab = getCurrentTabName();
-			if (newTabId == null && !tabName.equals(tab)) {
-				String oldTabId = getTabName(tabName);
-				if (oldTabId != null) {
-					String windowHandle = getDriver().getWindowHandle();
-					getDriver().switchTo().window(oldTabId).close();
-					windowMap.remove(tabName);
-					getDriver().switchTo().window(windowHandle);
+		if (element != null) {
+			WebDriverException exception = null;
+			for (long i = 0; i < getTimeout(action) && !isStoppedTest(); i += SLEEP_INTERVAL) {
+				try {
+					element.click();
+					exception = null;
+					break;
+				} catch (WebDriverException e) {
+					exception = e;
 				}
+				sleep(SLEEP_INTERVAL);
 			}
+			checkExceptionState(exception);
+			checkAuthAllert(action, SLEEP_INTERVAL);
 
-			if (newTabId == null && !tabName.equals(tab)) {
-				String oldTabId = windowMap.get(tab);
-				windowMap.remove(tab);
-				windowMap.put(tabName, oldTabId);
-				createTab(getDriver(), tab);
-			}
+			String tabName = attr(action, "tab");
+			if (tabName != null) {
+				String newTabId = getNewTabId(existedWindowHandles);
 
-			if (newTabId != null) {
-				String recuiredTabId = windowMap.get(tabName);
-				if (recuiredTabId != null) {
-					try {
-						getDriver().switchTo().window(recuiredTabId).close();
+				String tab = getCurrentTabName();
+				if (newTabId == null && !tabName.equals(tab)) {
+					String oldTabId = getTabName(tabName);
+					if (oldTabId != null) {
+						String windowHandle = getDriver().getWindowHandle();
+						getDriver().switchTo().window(oldTabId).close();
 						windowMap.remove(tabName);
-					} catch (NoSuchWindowException e) {
-						windowMap.remove(tabName);
+						getDriver().switchTo().window(windowHandle);
 					}
 				}
-				windowMap.put(tabName, newTabId);
-			}
-		}
 
-		updateTabTitle();
+				if (newTabId == null && !tabName.equals(tab)) {
+					String oldTabId = windowMap.get(tab);
+					windowMap.remove(tab);
+					windowMap.put(tabName, oldTabId);
+					createTab(getDriver(), tab);
+				}
+
+				if (newTabId != null) {
+					windowMap.computeIfPresent(tabName, (k, v) -> {
+						try {
+							getDriver().switchTo().window(v).close();
+							windowMap.remove(tabName);
+						} catch (NoSuchWindowException e) {
+							windowMap.remove(tabName);
+						}
+						return newTabId;
+					});
+				}
+			}
+
+			updateTabTitle();
+		}
 	}
 
 	private String getTabName(String tabName) {
@@ -545,17 +558,19 @@ public class Web extends TaskProcessor {
 	}
 
 	@CommandExamples({ "<GetText name='result' xpath='' ></GetText>" })
-	public void runCommandGetText(Node action) throws CommandException {
+	public void runCommandGetText(Node action) {
 		try {
 			WebElement element = findElementWithTimeout(action, true);
 			String text = "";
-			String tagName = element.getTagName();
-			if ("input".equals(tagName)) {
-				text = element.getAttribute("value");
-			} else {
-				text = element.getText();
+			if (element != null) {
+				String tagName = element.getTagName();
+				if ("input".equals(tagName)) {
+					text = element.getAttribute("value");
+				} else {
+					text = element.getText();
+				}
+				setVariableValue(attr(action, "name"), text);
 			}
-			setVariableValue(attr(action, "name"), text);
 		} catch (Exception e) {
 			checkExceptionState(e);
 		}
@@ -564,7 +579,7 @@ public class Web extends TaskProcessor {
 	}
 
 	@CommandExamples({ "<GetUrl name=''/>" })
-	public void runCommandGetUrl(Node action) throws CommandException {
+	public void runCommandGetUrl(Node action) {
 		try {
 			String currentUrl = getDriver().getCurrentUrl();
 			setVariableValue(attr(action, "name"), currentUrl);
@@ -580,11 +595,10 @@ public class Web extends TaskProcessor {
 	public void runCommandFrame(Node action) throws CommandException {
 		String name = attr(action, "name");
 		String xpath = attr(action, "xpath");
-		long timeout = getTimeout(action);
 
 		WebDriverException exception = null;
 		boolean frameSelected = false;
-		for (long i = 0; i < timeout && !isStoppedTest(); i += SLEEP_INTERVAL) {
+		for (long i = 0; i < getTimeout(action) && !isStoppedTest(); i += SLEEP_INTERVAL) {
 			try {
 				if (name != null) {
 					getDriver().switchTo().frame(name);
@@ -617,16 +631,12 @@ public class Web extends TaskProcessor {
 
 	@CommandExamples({ "<ElementExists xpath=''>...</ElementExists>" })
 	public void runCommandElementExists(Node action) throws CommandException {
-		boolean result = false;
 		try {
 			findElementWithTimeout(action, false);
-			result = true;
-		} catch (Exception e) {
-			// do nothing;
-		}
-
-		if (result) {
 			taskNode(action, false);
+		} catch (Exception e) {
+			Node[] nodes = action.getNodes("Else");
+			runNodes(nodes);
 		}
 
 		updateTabTitle();
@@ -649,24 +659,23 @@ public class Web extends TaskProcessor {
 	}
 
 	@CommandExamples({ "<CheckPage url_regex='' title_regex='' timeout=''/>" })
-	public void runCommandCheckPage(Node action) throws CommandException {
-		String url_regex = attr(action, "url_regex");
-		String title_regex = attr(action, "title_regex");
+	public void runCommandCheckPage(Node action) {
+		String urlRegex = attr(action, "url_regex");
+		String titleRegex = attr(action, "title_regex");
 
-		long timeout = getTimeout(action);
-		for (long i = 0; i < timeout && !isStoppedTest(); i += SLEEP_INTERVAL) {
+		for (long i = 0; i < getTimeout(action) && !isStoppedTest(); i += SLEEP_INTERVAL) {
 			String currentUrl = getDriver().getCurrentUrl();
 			String currentTitle = getDriver().getTitle();
 
-			if (isMatched(url_regex, currentUrl) && isMatched(title_regex, currentTitle)) {
+			if (isMatched(urlRegex, currentUrl) && isMatched(titleRegex, currentTitle)) {
 				updateTabTitle();
 				return;
 			}
 			sleep(SLEEP_INTERVAL);
 		}
 
-		TestCase.fail("Page [" + (url_regex != null ? "url_regex:" + url_regex : " ")
-				+ (title_regex != null ? "title_regex:" + title_regex : " ") + "] is not found.");
+		TestCase.fail("Page [" + (urlRegex != null ? "url_regex:" + urlRegex : " ")
+				+ (titleRegex != null ? "title_regex:" + titleRegex : " ") + "] is not found.");
 
 	}
 
@@ -680,12 +689,11 @@ public class Web extends TaskProcessor {
 		return result;
 	}
 
-	private WebElement findElementWithTimeout(Node action, boolean inner) throws CommandException {
+	private WebElement findElementWithTimeout(Node action, boolean inner) {
 		WebElement findElement = null;
 		Exception exception = null;
-		long timeout = getTimeout(action);
 
-		for (long i = 0; i < timeout && !isStoppedTest(); i += SLEEP_INTERVAL) {
+		for (long i = 0; i < getTimeout(action) && !isStoppedTest(); i += SLEEP_INTERVAL) {
 			try {
 				findElement = findElement(action, inner);
 				exception = null;
@@ -702,7 +710,7 @@ public class Web extends TaskProcessor {
 		return findElement;
 	}
 
-	private void checkExceptionState(Exception exception) throws CommandException {
+	private void checkExceptionState(Exception exception) {
 		if (exception != null && !isStoppedTest()) {
 			if (exception instanceof WebDriverException) {
 				throw new InvalidArgumentException(StringUtils.substringBefore(exception.getMessage(), "\n"),
@@ -714,24 +722,23 @@ public class Web extends TaskProcessor {
 	}
 
 	private long getTimeout(Node action) {
-		long timeout = this.timeout;
+		long result = this.timeout;
 		String timeoutAttr = attr(action, "timeout");
 		if (StringUtils.isNotBlank(timeoutAttr)) {
-			timeout = Long.parseLong(timeoutAttr);
+			result = Long.parseLong(timeoutAttr);
 		}
-		return timeout;
+		return result;
 	}
 
-	private WebElement findElement(Node action, boolean inner) throws NoSuchElementException, CommandException {
+	private WebElement findElement(Node action, boolean inner) throws NoSuchElementException {
 		WebElement findElement = null;
 		NoSuchElementException lastException = null;
-		if (inner && action.size() > 0) {
+		if (inner && !action.isEmpty()) {
 			for (Node node : action) {
 				try {
 					findElement = findElementByInnerNode(node);
 				} catch (NoSuchElementException e) {
 					lastException = e;
-					continue;
 				}
 			}
 		} else {
@@ -751,7 +758,8 @@ public class Web extends TaskProcessor {
 	private WebElement findElementByInnerNode(Node node) throws NoSuchElementException {
 		String name = node.getTag();
 		String value = replaceProperties(node.getInnerText());
-		LinkedMap attributes = new LinkedMap();
+		@SuppressWarnings("unchecked")
+		Map<String, String> attributes = new LinkedMap();
 		attributes.put(name, value);
 		return findElement(attributes);
 	}
@@ -798,7 +806,7 @@ public class Web extends TaskProcessor {
 			return getDriver().findElement(By.xpath(attr));
 		}
 
-		if (exceptionByMName != null && element == null) {
+		if (exceptionByMName != null) {
 			throw exceptionByMName;
 		}
 		return element;
@@ -824,12 +832,13 @@ public class Web extends TaskProcessor {
 	}
 
 	@CommandExamples({ "<CloseDriver />" })
-	public void runCommandCloseDriver(Node action) throws CommandException {
+	public void runCommandCloseDriver(Node action) {
 		quiteDriver();
 	}
 
+	@SuppressWarnings("unchecked")
 	@CommandExamples({ "<DeleteCookie except='type:property'/>", "<DeleteCookie />", "<DeleteCookie name=''/>" })
-	public void runCommandDeleteCookie(Node action) throws CommandException {
+	public void runCommandDeleteCookie(Node action) {
 		Object except = attrValue(action, "except");
 		WebDriver driver = getDriver();
 		Options manage = driver.manage();
@@ -862,7 +871,7 @@ public class Web extends TaskProcessor {
 
 			if (StringUtils.isBlank(cookieName)) {
 				Set<Cookie> cookies = manage.getCookies();
-				if (cookies.size() > 0) {
+				if (!cookies.isEmpty()) {
 					StringBuilder report = new StringBuilder("Removed cookies: ");
 					for (Cookie cookie : cookies) {
 						report.append("\n" + cookie.getName() + "=" + cookie.getValue());
@@ -881,8 +890,9 @@ public class Web extends TaskProcessor {
 		updateTabTitle();
 	}
 
+	@SuppressWarnings("unchecked")
 	@CommandExamples({ "<CookieReport name='type:property'/>" })
-	public void runCommandCookieReport(Node action) throws CommandException {
+	public void runCommandCookieReport(Node action) {
 		String name = attr(action, "name");
 		Map<String, String> report = (Map<String, String>) getVariableValue(name);
 		if (report == null) {

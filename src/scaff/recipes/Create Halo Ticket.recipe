@@ -1,0 +1,200 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Recipe name="Create Halo Ticket">
+	<Var name="Order Number" init="mandatory" /> 
+	<Trim name="Order Number" /> 
+	<Var name="Create Halo Enabled" value="true" /> 
+	<If isNotNull="Order Number">
+		<Task name="Halo Order Check" /> 
+	</If> 
+	<Trim name="Order Number" /> 
+	<If isNull="Summary">
+		<If isNotNull="Order Number">
+			<Var name="Order Report Reason" source="Batch Process" /> 
+			<Restore name="Batch Process">
+				<Remove name="Batch Process" /> 
+				<Task name="Order Report" /> 
+			</Restore> 
+			<Remove name="Create Halo Enabled" /> 
+			<Confirm message="Want to create a Halo ticket for order: $var{Order Number}">
+				<Var name="Create Halo Enabled" value="true" /> 
+			</Confirm> 
+		</If> 
+		<If isNotNull="Create Halo Enabled">
+			<Extern tab="halo" class="com.ganteater.ae.processor.Web" timeout="6000">
+				<Page url="$var{Halo Url}/tickets?area=1&mainview=team&viewid=2&selid=72&sellevel=2&selparentid=$var{sub_prj1_name}%20atg%20team" /> 
+				<ElementExists id="Username" timeout="200">
+					<Task name="Open Halo" /> 
+				</ElementExists> 
+				<ElementNotExists xpath="//*[@id='app-container']/div/div/div[2]/div[2]/div[3]/div/div/div[3]/div/div[3]/div/div[1]/div/div[2]/div[1]/div/div/div[1]/div/div[2]/div[1]/h1" timeout="200">
+					<Click xpath="//button[contains(text(),'New')]" /> 
+					<Var name="name" source="USER_NAME" /> 
+					<Replace name="name" oldChar="_" newChar=" " /> 
+					<Text value="$var{name}" xpath="//*[@id='react-select-3--value']/div[2]/input" exception="ignored" /> 
+					<Click>
+						<xpath>//*[@id="react-select-3--option-0"]</xpath> 
+					</Click> 
+				</ElementNotExists> 
+				<Click exception="ignored">
+					<xpath>//*[@id='react-select-11--value-item']</xpath> 
+				</Click> 
+				<Text xpath="//*[@id='react-select-11--value']/div[2]/input" value="Standard Incident$var{\n}" /> 
+				<Click>
+					<xpath>/html/body/div[1]/div/div/div[2]/div[2]/div[3]/div/div/div[3]/div/div[3]/div/div[1]/div/div[2]/div[2]/div/div/div/div/div/div/form/div/div[1]/div[2]/div[3]/div/div/div</xpath> 
+				</Click> 
+				<Text value="Manage Orders$var{\n}">
+					<xpath>/html/body/div[1]/div/div/div[2]/div[2]/div[3]/div/div/div[3]/div/div[3]/div/div[1]/div/div[2]/div[2]/div/div/div/div/div/div/form/div/div[1]/div[2]/div[3]/div/div/div/div/span[1]/div[2]/input</xpath> 
+				</Text> 
+				<Text value="Medium$var{\n}">
+					<xpath>/html/body/div[1]/div/div/div[2]/div[2]/div[3]/div/div/div[3]/div/div[3]/div/div[1]/div/div[2]/div[2]/div/div/div/div/div/div/form/div/div[1]/div[2]/div[4]/div/div/div/div/span[1]/div[2]/input</xpath> 
+				</Text> 
+				<Click xpath="//*[@id='newticket-container']/div/div/div/div/div/form/div/div[1]/div[2]/div[2]/div/div/div/div[1]" /> 
+				<If isNotNull="Order Number">
+					<If isNotNull="fc_order">
+						<Else>
+							<Text value="Order not in Fluent">
+								<xpath>/html/body/div[1]/div/div/div[2]/div[2]/div[3]/div/div/div[3]/div/div[3]/div/div[1]/div/div[2]/div[2]/div/div/div/div/div/div/form/div/div[1]/div[2]/div[2]/div/div/div/div/span[1]/input</xpath> 
+							</Text> 
+							<Click>
+								<xpath>//*[@id="newticket-container"]/div/div/div/div/div/form/div/div[1]/div[2]/div[2]/div/div/div/div[2]/div/div/div/div/div/div[2]/div[1]/div/div/div[4]/span[3]/span[2]</xpath> 
+							</Click> 
+						</Else> 
+						<If name="fc_order::data::order::status" equals="PENDING_PAYMENT">
+							<Text value="Stuck in Pending Payment">
+								<xpath>/html/body/div[1]/div/div/div[2]/div[2]/div[3]/div/div/div[3]/div/div[3]/div/div[1]/div/div[2]/div[2]/div/div/div/div/div/div/form/div/div[1]/div[2]/div[2]/div/div/div/div/span[1]/input</xpath> 
+							</Text> 
+							<Else>
+								<If name="fc_order::data::order::status" equals="REMORSE">
+									<Text value="Stuck in Pending Payment">
+										<xpath>/html/body/div[1]/div/div/div[2]/div[2]/div[3]/div/div/div[3]/div/div[3]/div/div[1]/div/div[2]/div[2]/div/div/div/div/div/div/form/div/div[1]/div[2]/div[2]/div/div/div/div/span[1]/input</xpath> 
+									</Text> 
+									<Else>
+										<If name="fc_order::data::order::status" equals="BOOKED">
+											<Text value="Stuck in Booked">
+												<xpath>/html/body/div[1]/div/div/div[2]/div[2]/div[3]/div/div/div[3]/div/div[3]/div/div[1]/div/div[2]/div[2]/div/div/div/div/div/div/form/div/div[1]/div[2]/div[2]/div/div/div/div/span[1]/input</xpath> 
+											</Text> 
+											<Else>
+												<If name="fc_order::data::order::status" equals="PENDING_MANUAL_FRAUD_CHECK">
+													<Text value="Stuck in Manual Fraud Check">
+														<xpath>/html/body/div[1]/div/div/div[2]/div[2]/div[3]/div/div/div[3]/div/div[3]/div/div[1]/div/div[2]/div[2]/div/div/div/div/div/div/form/div/div[1]/div[2]/div[2]/div/div/div/div/span[1]/input</xpath> 
+													</Text> 
+													<Else>
+														<If name="fc_order::data::order::status" equals="SHIPPED">
+															<Text value="Process Manual Refund">
+																<xpath>/html/body/div[1]/div/div/div[2]/div[2]/div[3]/div/div/div[3]/div/div[3]/div/div[1]/div/div[2]/div[2]/div/div/div/div/div/div/form/div/div[1]/div[2]/div[2]/div/div/div/div/span[1]/input</xpath> 
+															</Text> 
+															<Else>
+																<If name="fc_order::data::order::status" equals="DELIVERED">
+																	<Text value="Process Manual Refund">
+																		<xpath>/html/body/div[1]/div/div/div[2]/div[2]/div[3]/div/div/div[3]/div/div[3]/div/div[1]/div/div[2]/div[2]/div/div/div/div/div/div/form/div/div[1]/div[2]/div[2]/div/div/div/div/span[1]/input</xpath> 
+																	</Text> 
+																	<Else>
+																		<If name="fc_order::data::order::status" equals="PENDING_REFUND">
+																			<Text value="Stuck in Pending Refund">
+																				<xpath>/html/body/div[1]/div/div/div[2]/div[2]/div[3]/div/div/div[3]/div/div[3]/div/div[1]/div/div[2]/div[2]/div/div/div/div/div/div/form/div/div[1]/div[2]/div[2]/div/div/div/div/span[1]/input</xpath> 
+																			</Text> 
+																			<Else>
+																				<If name="fc_order::data::order::status" equals="AWAITING_COURIER">
+																					<Text value="Stuck in Booked">
+																						<xpath>/html/body/div[1]/div/div/div[2]/div[2]/div[3]/div/div/div[3]/div/div[3]/div/div[1]/div/div[2]/div[2]/div/div/div/div/div/div/form/div/div[1]/div[2]/div[2]/div/div/div/div/span[1]/input</xpath> 
+																					</Text> 
+																					<Else>
+																						<Text value="Stuck">
+																							<xpath>/html/body/div[1]/div/div/div[2]/div[2]/div[3]/div/div/div[3]/div/div[3]/div/div[1]/div/div[2]/div[2]/div/div/div/div/div/div/form/div/div[1]/div[2]/div[2]/div/div/div/div/span[1]/input</xpath> 
+																						</Text> 
+																					</Else> 
+																				</If> 
+																			</Else> 
+																		</If> 
+																	</Else> 
+																</If> 
+															</Else> 
+														</If> 
+													</Else> 
+												</If> 
+											</Else> 
+										</If> 
+									</Else> 
+								</If> 
+							</Else> 
+						</If> 
+					</If> 
+					<Else>
+						<Text value="Process Not Listed">
+							<xpath>/html/body/div[1]/div/div/div[2]/div[2]/div[3]/div/div/div[3]/div/div[3]/div/div[1]/div/div[2]/div[2]/div/div/div/div/div/div/form/div/div[1]/div[2]/div[2]/div/div/div/div/span[1]/input</xpath> 
+						</Text> 
+					</Else> 
+				</If> 
+				<Click exception="ignored" timeout="20">
+					<xpath>//*[@id="newticket-container"]/div/div/div/div/div/form/div/div[1]/div[2]/div[2]/div/div/div/div[2]/div/div/div/div/div/div[2]/div[1]/div/div/div/span[2]</xpath> 
+				</Click> 
+				<Click xpath="//*[@id='app-container']/div/div/div[2]/div[2]/div[3]/div/div/div[3]/div/div[3]/div/span/div/strong/div/button" exception="ignored" timeout="20" /> 
+				<Remove name="Summary Sufix" /> 
+				<If name="Halo Summary" startsWith="WMS Order status is not equal to CT for">
+					<If isNotNull="WMS Orders">
+						<Var name="WMS Order Status" source="WMS Orders::$var{Order Number}" /> 
+						<If isNotNull="WMS Order Status">
+							<Else>
+								<Var name="Summary Sufix">, WMS Order not found.</Var> 
+							</Else> 
+							<Var name="Summary Sufix">, WMS Order Status: $var{WMS Order Status}.</Var> 
+						</If> 
+					</If> 
+				</If> 
+				<If isNotNull="Order Number">
+					<Var name="ticket summary" value="$var{Halo Summary,Stuck} Order: $var{Order Number} ($var{fc_order::data::order::status,Not In FC})$var{Summary Sufix}" /> 
+					<Text id="input-field-for-summary" value="$var{ticket summary}" /> 
+					<ElementExists id="input-field-for-customfield_176" timeout="100">
+						<Text id="input-field-for-customfield_176" value="$var{Order Number}" /> 
+					</ElementExists> 
+				</If> 
+				<Text value="Applications Team$var{\n}" exception="ignored">
+					<xpath>//*[@id='react-select-18--value']/div[2]/input</xpath> 
+					<xpath>//*[@id="react-select-15--value"]/div[2]/input</xpath> 
+				</Text> 
+				<Formater name="Order Report" type="json" /> 
+				<Replace name="Order Report" oldChar="$var{\t}" newChar=" " /> 
+				<Var name="halo ticket details">Hello,
+
+Stuck $var{Order Report}
+
+Thanks,</Var> 
+				<Size name="details size" source="halo ticket details" /> 
+				<If expression="$var{details size} &gt; 5000">
+					<Else>
+						<Out name="halo ticket details" /> 
+					</Else> 
+					<Var name="halo ticket details" init="console" type="text" /> 
+				</If> 
+				<Click>
+					<xpath>/html/body/div[1]/div/div/div[2]/div[2]/div[3]/div/div/div[3]/div/div[3]/div/div[1]/div/div[2]/div[2]/div/div/div/div/div/div/form/div/div[1]/div[2]/div[6]/div/div/div/div[3]/div</xpath> 
+					<xpath>/html/body/div[1]/div/div/div[2]/div[2]/div[3]/div/div/div[3]/div/div[3]/div/div[1]/div/div[2]/div[2]/div/div/div/div/div/div/form/div/div[1]/div[2]/div[7]/div/div/div/div[3]/div</xpath> 
+				</Click> 
+				<Text value="$var{halo ticket details}">
+					<xpath>/html/body/div[1]/div/div/div[2]/div[2]/div[3]/div/div/div[3]/div/div[3]/div/div[1]/div/div[2]/div[2]/div/div/div/div/div/div/form/div/div[1]/div[2]/div[6]/div/div/div/div[3]/div</xpath> 
+					<xpath>/html/body/div[1]/div/div/div[2]/div[2]/div[3]/div/div/div[3]/div/div[3]/div/div[1]/div/div[2]/div[2]/div/div/div/div/div/div/form/div/div[1]/div[2]/div[7]/div/div/div/div[3]/div</xpath> 
+				</Text> 
+				<Click xpath="//*[@id='app-container']/div/div/div[2]/div[2]/div[3]/div/div/div[3]/div/div[3]/div/span/div/strong/div/button" exception="ignored" timeout="200" /> 
+				<Confirm message="Please check the ticket details and press OK to create the ticket.">
+					<Click timeout="100">
+						<xpath>//*[@id="newticket-container"]/div/div/div/div/div/form/div/div[2]/input</xpath> 
+					</Click> 
+					<Wait delay="2000" /> 
+					<Remove name="summary" /> 
+					<GetText exception="ignored" name="summary" xpath="/html/body/div[1]/div/div/div/div[2]/div[3]/div/div/div[3]/div/div[3]/div/div/div[2]/div/div/div[1]/div/div/div/div/div[1]/div/div/div/div[1]/div[2]/div/div[3]/div/div[1]/div/div/div/div/div/div/div" timeout="4000" /> 
+					<If name="summary" equals="$var{ticket summary}">
+						<GetUrl name="url" /> 
+						<Out name="url" /> 
+					</If> 
+				</Confirm> 
+			</Extern> 
+		</If> 
+		<Else>
+			<Extern tab="halo" class="com.ganteater.ae.processor.Web" type="chrome" timeout="6000">
+				<GetUrl name="url" /> 
+				<Out name="url" type="url" /> 
+				<Var name="Ticket Number" start="&id=" source="url" /> 
+				<Out level="error">Halo ticket already exists for order: $var{Order Number} [$var{Ticket Number}]</Out> 
+			</Extern> 
+		</Else> 
+	</If> 
+</Recipe> 
