@@ -5,8 +5,8 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.ganteater</groupId>
-		<artifactId>anteater</artifactId>
+		<groupId>com.ganteater.plugins</groupId>
+		<artifactId>ae-plugins</artifactId>
 		<version>1.2.1-SNAPSHOT</version>
 	</parent>
 
