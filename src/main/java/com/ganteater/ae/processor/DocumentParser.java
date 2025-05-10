@@ -43,10 +43,6 @@ import com.ganteater.ae.util.xml.easyparser.Node;
 
 public class DocumentParser extends BaseProcessor {
 
-	public DocumentParser(Processor aParent) {
-		super(aParent);
-	}
-
 	@CommandExamples({ "<URLParser name='type:property' charset='UTF-8'/>" })
 	public void runCommandURLParser(Node action) throws URISyntaxException {
 		String name = attr(action, "name");

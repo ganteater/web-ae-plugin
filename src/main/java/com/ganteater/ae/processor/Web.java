@@ -67,8 +67,7 @@ public class Web extends BaseProcessor {
 	private String type;
 	private static Map<String, String> windowMap = new HashMap<>();
 
-	public Web(Processor aParent) {
-		super(aParent);
+	public Web() {
 		webParrentProcessor = getWebParrentProcessor();
 		if (webParrentProcessor != null) {
 			setDriver(webParrentProcessor.getDriver());

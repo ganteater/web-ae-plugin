@@ -21,13 +21,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.ganteater</groupId>
-			<artifactId>anteater-cli</artifactId>
-			<version>1.2.1-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
 			<version>1.14.3</version>
@@ -59,26 +52,4 @@
 		</dependency>
 	</dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>com.ganteater</groupId>
-				<artifactId>ae-maven-plugin</artifactId>
-				<version>1.2.1-SNAPSHOT</version>
-				<configuration>
-					<basedir>src/scaff</basedir>
-					<variables>
-						<project.version>${project.version}</project.version>
-					</variables>
-				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>${project.groupId}</groupId>
-						<artifactId>${project.artifactId}</artifactId>
-						<version>${project.version}</version>
-					</dependency>
-				</dependencies>
-			</plugin>
-		</plugins>
-	</build>
 </project>
