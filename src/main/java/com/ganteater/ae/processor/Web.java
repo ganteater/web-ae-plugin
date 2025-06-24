@@ -195,7 +195,10 @@ public class Web extends BaseProcessor {
 
 			if (driverPath == null) {
 				File startDir = new File(getListener().getManager().getFile(PLUGINS_DIR_NAME), driverFileName);
-
+				if (!startDir.exists()) {
+					File homePluginsDir = new File(getListener().getManager().getHomeWorkingDir(), PLUGINS_DIR_NAME);
+					startDir = new File(homePluginsDir, driverFileName);
+				}
 				if (!startDir.exists()) {
 					showDriverNotFound(driverType);
 				} else {
