@@ -42,7 +42,6 @@ import org.openqa.selenium.remote.CapabilityType;
 import com.ganteater.ae.AEWorkspace;
 import com.ganteater.ae.CommandException;
 import com.ganteater.ae.processor.annotation.CommandExamples;
-import com.ganteater.ae.processor.annotation.CommandHotHepl;
 import com.ganteater.ae.util.TestCase;
 import com.ganteater.ae.util.xml.easyparser.Node;
 
@@ -355,7 +354,6 @@ public class Web extends BaseProcessor {
 	}
 
 	@CommandExamples("<RunIfFirst>...</RunIfFirst>")
-	@CommandHotHepl("Will run if this code does not have a parent Web tag. If you need to run when the parent is you can use <Else> inside.")
 	public void runCommandRunIfFirst(Node action) {
 		try {
 			if (webParrentProcessor == null) {
@@ -395,7 +393,6 @@ public class Web extends BaseProcessor {
 	}
 
 	@CommandExamples({ "<Page url='type:string' />", "<Page url='' timeout='' username='' password=''/>" })
-	@CommandHotHepl("Use this command to open a web page by URL.")
 	public void runCommandPage(Node action) {
 		String attr = attr(action, "url");
 		getDriver().get(attr);
@@ -408,7 +405,6 @@ public class Web extends BaseProcessor {
 
 	@CommandExamples({ "<Text value='' name='type:string' />", "<Text value=''><name>...</name></Text>",
 			"<Text value=''>" + SELECTOR_TARG_LIST + "</Text>" })
-	@CommandHotHepl("You can use this command for input a text in the field. The field identified by id, name, xpath and other.")
 	public void runCommandText(Node action) {
 		try {
 			WebElement element = findElementWithTimeout(action, true);

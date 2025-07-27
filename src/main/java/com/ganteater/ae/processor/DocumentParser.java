@@ -37,7 +37,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.ganteater.ae.processor.annotation.CommandExamples;
-import com.ganteater.ae.processor.annotation.CommandHotHepl;
 import com.ganteater.ae.util.xml.easyparser.EasyParser;
 import com.ganteater.ae.util.xml.easyparser.Node;
 
@@ -63,7 +62,6 @@ public class DocumentParser extends BaseProcessor {
 	}
 
 	@SuppressWarnings("unchecked")
-	@CommandHotHepl("<html></html>")
 	@CommandExamples({ "<Extract name='type:property' source='type:property' xpath='type:string' />",
 			"<Extract name='type:property' source='type:property' selector='type:string' />" })
 	public void runCommandExtract(final Node aCurrentAction)

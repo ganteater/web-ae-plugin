@@ -1,7 +1,8 @@
 <Recipe name="Web Page">
-  <Extern class="Web">
-    <Page url="https://duckduckgo.com/" /> 
-    <Text name="q" value="anteater manual test tool" /> 
-    <Click xpath="//*[@id='searchbox_homepage']/div/div/div/button[2]" /> 
-  </Extern> 
+	<Extern class="Web">
+		<Page url="https://duckduckgo.com/" /> 
+		<Regexp name="HOME_WORKINGDIR" source="HOME_WORKINGDIR" regex="ttt" /> 
+		<Text name="q" value="anteater manual test tool" /> 
+		<Click xpath="//*[@id='searchbox_homepage']/div/div/div/button[2]" /> 
+	</Extern> 
 </Recipe> 
