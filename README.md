@@ -6,7 +6,7 @@
 
 The **Web Anteater Plugin** extends the functionality of Anteater to manage and interact with web browsers for automation and business workflows using Anteater recipes. The plugin provides a set of browser control commands designed for tasks such as navigating webpages, interacting with UI elements, verifying page properties, and more.
 
-Anteater uses **recipe tags** based on the method names of the processor. Tags are derived from the `runCommand<MethodName>` methods, with the prefix removed and the first letter converted to **Capital case**. For example:
+Anteater uses **recipe tags** based on the method names of the processor. Tags are derived from the `runCommand<TagName>` methods, with the prefix removed and the first letter converted to **Capital case**. For example:
 - `runCommandPage` becomes `<Page>`
 - `runCommandClick` becomes `<Click>`
 
@@ -32,7 +32,9 @@ Class Diagram
 Below is the list of available recipe commands derived from `runCommand` methods in the Web processor:
 
 #### **General Browser Commands**
-1. **`<RunIfFirst>`**: Executes the first operation of a defined sequence.
+1. **`<RunIfFirst>`**: Executes content only for the root Web processor.
+    This tag is useful for operations that should only be executed once when the root Web processor is initialized.
+    It ensures that specific actions—such as global browser setup—apply only to the main instance rather than nested or child processors.
 2. **`<Page>`**: Loads a webpage based on a specified URL.
 3. **`<CloseDriver>`**: Closes the browser driver once work is completed.
 
