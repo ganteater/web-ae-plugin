@@ -353,7 +353,7 @@ public class Web extends BaseProcessor {
 		}
 	}
 
-	@CommandExamples("<RunIfFirst>...</RunIfFirst>")
+	@CommandExamples({"<RunIfFirst>...</RunIfFirst>", "<RunIfFirst>\n\t<Else>...</Else>\t\n</RunIfFirst>"})
 	public void runCommandRunIfFirst(Node action) {
 		try {
 			if (webParrentProcessor == null) {
