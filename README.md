@@ -137,18 +137,6 @@ $HOME/anteater/plugins
 3. **Driver Management**:
    - Regularly update browser drivers to ensure compatibility with the latest browser releases.
 
-## Resources
-
-### **Plugin Homepage**
-- [Web Anteater Plugin Project Page](https://sourceforge.net/p/anteater/code/HEAD/tree/trunk/anteater/web-ae-plugin/)
-
-### **Direct Downloads**
-- **JAR File**: [Download Plugin JAR](https://sourceforge.net/projects/anteater/files/plugins/web-ae-plugin.jar/download)
-
-### **Driver Downloads**
-- [ChromeDriver](https://chromedriver.chromium.org/downloads)
-- [GeckoDriver for Firefox](https://github.com/mozilla/geckodriver/releases)
-
 ## Troubleshooting
 
 If you encounter issues while using the Web Anteater Plugin:
