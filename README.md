@@ -65,7 +65,7 @@ Below is the list of available recipe commands derived from `runCommand` methods
 #### **Example 1: Loading a Page and Clicking a Button**
 ```xml
 <Recipe name="LoadAndClick">
-    <Extern tab="ms" class="Web" timeout="6000">
+    <Extern tab="a" class="Web" timeout="6000">
         <Page url="https://example.com" />
         <Click xpath="//button[@id='submit']" />
     </Extern>
@@ -75,7 +75,7 @@ Below is the list of available recipe commands derived from `runCommand` methods
 #### **Example 2: Interacting with an Input Field**
 ```xml
 <Recipe name="InputText">
-    <Extern tab="ms" class="Web" timeout="6000">
+    <Extern tab="a" class="Web" timeout="6000">
         <Page url="https://example.com/login" />
         <Text xpath="//input[@id='username']" value="TestUser" />
         <Click xpath="//button[@id='login']" />
@@ -86,7 +86,7 @@ Below is the list of available recipe commands derived from `runCommand` methods
 #### **Example 3: Verifying Element Presence**
 ```xml
 <Recipe name="VerifyElement">
-    <Extern tab="ms" class="Web" timeout="6000">
+    <Extern tab="a" class="Web" timeout="6000">
         <Page url="https://example.com/dashboard" />
         <ElementExists xpath="//div[@id='welcome-message']" />
     </Extern>
@@ -97,9 +97,6 @@ Below is the list of available recipe commands derived from `runCommand` methods
 
 ### **Download**
 - **JAR File**: [Download Plugin JAR](https://sourceforge.net/projects/anteater/files/plugins/web-ae-plugin.jar/download)
-
-### **Source Code**
-- **SVN URL**: [Web Anteater Plugin Source Code](https://svn.code.sf.net/p/anteater/code/trunk/anteater/web-ae-plugin)
 
 ### **Maven Dependency**
 [![Anteater](https://img.shields.io/maven-central/v/com.ganteater.plugins/web-ae-plugin.svg)](https://central.sonatype.com/artifact/com.ganteater.plugins/web-ae-plugin)
