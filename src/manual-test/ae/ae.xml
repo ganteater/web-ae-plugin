@@ -19,7 +19,7 @@
 			File="$var{HOME_WORKINGDIR}/logs/$var{log_file}_$var{START_TIME}.log" />
 		<Recipes path="recipes" />
 
-		<Var name="FIREFOX_BINARY_PATH">C:\Users\vikto\AppData\Local\Mozilla Firefox\firefox.exe</Var>
+		<Var name="FIREFOX_BINARY_PATH" init="console" />
 	</Configuration>
 
 </Environment>
