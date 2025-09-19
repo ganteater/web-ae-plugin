@@ -20,8 +20,46 @@ Key features include:
 2. **UI Automation**:
    - Define Anteater recipes for testing UI workflows or performing repetitive tasks on webpages.
 3. **Driver Management**:
-   - Supports driver-based browser control for Chrome and Firefox.
+   - Supports driver-based browser control for Chrome, Firefox and MS Edge.
 
+## Initial Attributes
+
+| **Attribute Name** | **Value** | **Description** |
+|--------------------|-----------|-----------------| 
+| name 	             |           |                 |
+| type               | "msedge","gecko","chrome" | |
+| tab                |           |                 |
+
+Additional attribute for driver types:
+
+chrome:
+| **Attribute Name** | **Value** | **Description** |
+|--------------------|-----------|-----------------| 
+| deviceName         |           |                 |
+
+msedge: 
+| **Attribute Name** | **Value** | **Description** |
+|--------------------|-----------|-----------------| 
+| mode               | iexplorer |                 |
+
+default:
+| **Attribute Name** | **Value** | **Description** |
+|--------------------|-----------|-----------------| 
+| driver             |         | driver class name |
+
+Variable:
+| Variable Name | Default value | Description |
+|---------------|---------------|-------------|
+| WEBDRIVER_PATH |              |             |
+| WEB_DRIVER_TYPE |             |             |
+
+Example:
+
+```xml
+<Extern tab="ms" class="Web" type="chrome" timeout="8000">
+    ...
+</Extern>
+```
 
 ### **Recipe Commands**
 
