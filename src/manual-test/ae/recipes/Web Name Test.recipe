@@ -1,0 +1,14 @@
+<Recipe name="Web Name Test">
+	<Extern name="a" class="Web" type="gecko">
+		<Page url="https://duckduckgo.com" /> 
+	</Extern> 
+	<Extern name="b" class="Web">
+		<Page url="https://duckduckgo.com" /> 
+	</Extern> 
+	<Extern name="a" class="Web">
+		<Page url="https://google.com" /> 
+	</Extern> 
+	<Extern name="b" class="Web">
+		<Page url="https://yahoo.com" /> 
+	</Extern> 
+</Recipe> 

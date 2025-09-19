@@ -37,6 +37,11 @@ chrome:
 |--------------------|-----------|-----------------| 
 | deviceName         |           |                 |
 
+gecko:
+| Variable Name | Default value | Description |
+|---------------|---------------|-------------|
+| FIREFOX_BINARY_PATH |         |             |
+
 msedge: 
 | **Attribute Name** | **Value** | **Description** |
 |--------------------|-----------|-----------------| 

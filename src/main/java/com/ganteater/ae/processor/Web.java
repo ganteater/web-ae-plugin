@@ -213,6 +213,8 @@ public class Web extends BaseProcessor {
 			switch (driverType) {
 			case GECKO:
 				FirefoxOptions profile = new FirefoxOptions();
+				String binaryPath = getVariableString("FIREFOX_BINARY_PATH");
+				profile.setBinary(binaryPath);
 				driver = new FirefoxDriver(profile);
 				break;
 
@@ -353,7 +355,7 @@ public class Web extends BaseProcessor {
 		}
 	}
 
-	@CommandExamples({"<RunIfFirst>...</RunIfFirst>", "<RunIfFirst>\n\t<Else>...</Else>\t\n</RunIfFirst>"})
+	@CommandExamples({ "<RunIfFirst>...</RunIfFirst>", "<RunIfFirst>\n\t<Else>...</Else>\t\n</RunIfFirst>" })
 	public void runCommandRunIfFirst(Node action) {
 		try {
 			if (webParrentProcessor == null) {
