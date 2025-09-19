@@ -104,9 +104,9 @@ Below is the list of available recipe commands derived from `runCommand` methods
 Add the following dependency to your `pom.xml`:
 ```xml
 <dependency>
-    <groupId>com.nave.anteater</groupId>
+    <groupId>com.ganteater.plugins</groupId>
     <artifactId>web-ae-plugin</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.2</version>
 </dependency>
 ```
 
