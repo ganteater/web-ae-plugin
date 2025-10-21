@@ -260,10 +260,9 @@ public class Web extends BaseProcessor {
 
 				if (CHROME.equals(driverType)) {
 					message = message
-							+ "\nTo fix this issue you should download required webdriwer from\n download page: <a href=\"https://sites.google.com/chromium.org/driver/downloads\" >https://sites.google.com/chromium.org/driver/downloads</a>\n"
-							+ "and unpacked to <a href=\"file:" + StringUtils.substringBeforeLast(absolutePath, "\\")
-							+ "\"/>" + absolutePath
-							+ "</a>\n<b>Note: webdriver file can be locked, you should close Anteater and possible kill webdriver process manually.</b>";
+							+ "\nTo fix this issue you should download required webdriwer from\n download page: \"https://sites.google.com/chromium.org/driver/downloads\"\n"
+							+ "and unpacked to \"file:" + StringUtils.substringBeforeLast(absolutePath, "\\")
+							+ "\"\nNote: webdriver file can be locked, you should close Anteater and possible kill webdriver process manually.";
 				}
 
 				throw new CommandException(new IllegalArgumentException(message, e), this, action);
@@ -296,9 +295,9 @@ public class Web extends BaseProcessor {
 		throw new CommandException("Web driver not found.\n\n"
 				+ "If you know the path to the already loaded web driver, you can use the anteater environment variable: WEBDRIVER_PATH.\n"
 				+ "If you don't have the web driver, you can download it in the following folders:\n"
-				+ "BaseDir: <a href=\"file:" + baseDir + "\">" + baseDir.getAbsolutePath() + "</a>\n"
-				+ "or HomeDir: <a href=\"file:" + homeWorkingDir + "\">" + homeWorkingDir.getAbsolutePath() + "</a>\n"
-				+ "\nWebdriwer download page: <a href=\"" + downloadPage + "\" >" + downloadPage + "</a>\n"
+				+ "BaseDir: \"file:" + baseDir + "\"\n"
+				+ "or HomeDir: \"file:" + homeWorkingDir + "\"\n"
+				+ "\nWebdriwer download page: \"" + downloadPage + "\"\n"
 				+ "After installing the web driver, an application restart is required.", this);
 	}
 
