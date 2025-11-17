@@ -295,8 +295,7 @@ public class Web extends BaseProcessor {
 		throw new CommandException("Web driver not found.\n\n"
 				+ "If you know the path to the already loaded web driver, you can use the anteater environment variable: WEBDRIVER_PATH.\n"
 				+ "If you don't have the web driver, you can download it in the following folders:\n"
-				+ "BaseDir: \"file:" + baseDir + "\"\n"
-				+ "or HomeDir: \"file:" + homeWorkingDir + "\"\n"
+				+ "BaseDir: \"file:" + baseDir + "\"\n" + "or HomeDir: \"file:" + homeWorkingDir + "\"\n"
 				+ "\nWebdriwer download page: \"" + downloadPage + "\"\n"
 				+ "After installing the web driver, an application restart is required.", this);
 	}
@@ -662,19 +661,32 @@ public class Web extends BaseProcessor {
 		String urlRegex = attr(action, "url_regex");
 		String titleRegex = attr(action, "title_regex");
 
-		for (long i = 0; i < getTimeout(action) && !isStoppedTest(); i += SLEEP_INTERVAL) {
-			String currentUrl = getDriver().getCurrentUrl();
-			String currentTitle = getDriver().getTitle();
+		boolean urlMatched = true;
+		boolean titleMatched = true;
 
-			if (isMatched(urlRegex, currentUrl) && isMatched(titleRegex, currentTitle)) {
+		String currentUrl = getDriver().getCurrentUrl();
+		String currentTitle = getDriver().getTitle();
+
+		for (long i = 0; i < getTimeout(action) && !isStoppedTest(); i += SLEEP_INTERVAL) {
+			currentUrl = getDriver().getCurrentUrl();
+			currentTitle = getDriver().getTitle();
+
+			urlMatched = urlRegex == null ? true : isMatched(urlRegex, currentUrl);
+			titleMatched = titleRegex == null ? true : isMatched(titleRegex, currentTitle);
+
+			if (urlMatched && titleMatched) {
 				updateTabTitle();
 				return;
 			}
 			sleep(SLEEP_INTERVAL);
 		}
 
-		TestCase.fail("Page [" + (urlRegex != null ? "url_regex:" + urlRegex : " ")
-				+ (titleRegex != null ? "title_regex:" + titleRegex : " ") + "] is not found.");
+		if (!urlMatched) {
+			TestCase.fail("Page URL: [" + currentUrl + "], url_regex: [" + urlRegex + "]");
+		}
+		if (!titleMatched) {
+			TestCase.fail("Page Title: [" + currentTitle + "], url_regex: [" + titleRegex + "]");
+		}
 
 	}
 

@@ -135,24 +135,6 @@ Below is the list of available recipe commands derived from `runCommand` methods
     </Extern>
 </Recipe>
 ```
-
-## Installation
-
-### **Download**
-- **JAR File**: [Download Plugin JAR](https://sourceforge.net/projects/anteater/files/plugins/web-ae-plugin.jar/download)
-
-### **Maven Dependency**
-[![Anteater](https://img.shields.io/maven-central/v/com.ganteater.plugins/web-ae-plugin.svg)](https://central.sonatype.com/artifact/com.ganteater.plugins/web-ae-plugin)
-
-Add the following dependency to your `pom.xml`:
-```xml
-<dependency>
-    <groupId>com.ganteater.plugins</groupId>
-    <artifactId>web-ae-plugin</artifactId>
-    <version>1.2.2</version>
-</dependency>
-```
-
 ## Requirements
 
 ### **Web Driver**

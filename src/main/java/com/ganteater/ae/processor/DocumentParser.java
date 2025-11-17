@@ -167,7 +167,8 @@ public class DocumentParser extends BaseProcessor {
 		return theValue;
 	}
 
-	@CommandExamples({ "<PageParser url=''><select name='type:property'>...jsop_select...</select></PageParser>" })
+	@CommandExamples({ "<PageParser url='type:url'><select name='type:property'>...jsop_select...</select></PageParser>",
+		"<PageParser url='type:url' timeout='type:integer'><select name='type:property'>...jsop_select...</select></PageParser>"})
 	public void runCommandPageParser(Node action) throws IOException {
 		String url = attr(action, "url");
 		int timeout = Integer.parseInt(attr(action, "timeout", "2000"));
