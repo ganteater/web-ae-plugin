@@ -392,7 +392,7 @@ public class Web extends BaseProcessor {
 		}
 	}
 
-	@CommandExamples({ "<Page url='type:string' />", "<Page url='' timeout='' username='' password=''/>" })
+	@CommandExamples({ "<Page url='type:url' />", "<Page url='' timeout='type:time' username='' password=''/>" })
 	public void runCommandPage(Node action) {
 		String attr = attr(action, "url");
 		getDriver().get(attr);
@@ -403,7 +403,7 @@ public class Web extends BaseProcessor {
 		updateTabTitle();
 	}
 
-	@CommandExamples({ "<Text value='' name='type:string' />", "<Text value=''><name>...</name></Text>",
+	@CommandExamples({ "<Text value='type:string' name='type:string' />", "<Text value=''><name>...</name></Text>",
 			"<Text value=''>" + SELECTOR_TARG_LIST + "</Text>" })
 	public void runCommandText(Node action) {
 		try {
@@ -437,7 +437,7 @@ public class Web extends BaseProcessor {
 		}
 	}
 
-	@CommandExamples({ "<CloseTab name=''/>", "<CloseTab/>" })
+	@CommandExamples({ "<CloseTab name='type:property'/>", "<CloseTab/>" })
 	public void runCommandCloseTab(Node action) {
 		String tabName = attr(action, "name");
 		if (tabName != null) {
@@ -455,7 +455,7 @@ public class Web extends BaseProcessor {
 		updateTabTitle();
 	}
 
-	@CommandExamples({ "<Click xpath=''/>", "<Click>" + SELECTOR_TARG_LIST + "</Click>" })
+	@CommandExamples({ "<Click xpath='type:xpath'/>", "<Click>" + SELECTOR_TARG_LIST + "</Click>" })
 	public void runCommandClick(Node action) {
 		Set<String> existedWindowHandles = getDriver().getWindowHandles();
 
@@ -555,7 +555,7 @@ public class Web extends BaseProcessor {
 		return newTabId;
 	}
 
-	@CommandExamples({ "<GetText name='result' xpath='' ></GetText>" })
+	@CommandExamples({ "<GetText name='type:property' xpath='type:xpath' ></GetText>" })
 	public void runCommandGetText(Node action) {
 		try {
 			WebElement element = findElementWithTimeout(action, true);
@@ -576,7 +576,7 @@ public class Web extends BaseProcessor {
 		updateTabTitle();
 	}
 
-	@CommandExamples({ "<GetUrl name=''/>" })
+	@CommandExamples({ "<GetUrl name='type:property'/>" })
 	public void runCommandGetUrl(Node action) {
 		try {
 			String currentUrl = getDriver().getCurrentUrl();
@@ -588,8 +588,7 @@ public class Web extends BaseProcessor {
 		updateTabTitle();
 	}
 
-	@Override
-	@CommandExamples({ "<Frame name=''>...</Frame>", "<Frame xpath=''>...</Frame>" })
+	@CommandExamples({ "<Frame name=''>...</Frame>", "<Frame xpath='type:xpath'>...</Frame>" })
 	public void runCommandFrame(Node action) throws CommandException {
 		String name = attr(action, "name");
 		String xpath = attr(action, "xpath");
@@ -656,7 +655,7 @@ public class Web extends BaseProcessor {
 		updateTabTitle();
 	}
 
-	@CommandExamples({ "<CheckPage url_regex='' title_regex='' timeout=''/>" })
+	@CommandExamples({ "<CheckPage url_regex='' title_regex='' timeout='type:ms'/>" })
 	public void runCommandCheckPage(Node action) {
 		String urlRegex = attr(action, "url_regex");
 		String titleRegex = attr(action, "title_regex");
@@ -734,9 +733,9 @@ public class Web extends BaseProcessor {
 
 	private long getTimeout(Node action) {
 		long result = this.timeout;
-		String timeoutAttr = attr(action, "timeout");
-		if (StringUtils.isNotBlank(timeoutAttr)) {
-			result = Long.parseLong(timeoutAttr);
+		int timeout = (int) parseTime(action, "timeout", "0");
+		if (timeout > 0) {
+			result = timeout;
 		}
 		return result;
 	}
