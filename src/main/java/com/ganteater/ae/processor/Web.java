@@ -92,9 +92,7 @@ public class Web extends BaseProcessor {
 		String name = attr(action, "name");
 		driverName = StringUtils.defaultIfEmpty(name, driverName);
 
-		if (getDriver() == null) {
-			createDriver(action);
-		}
+		getDriver();
 
 		WebDriver driver = getDriver();
 
@@ -936,7 +934,15 @@ public class Web extends BaseProcessor {
 	}
 
 	private WebDriver getDriver() {
-		return WebDriverManager.getDriver(driverName);
+		WebDriver driver = WebDriverManager.getDriver(driverName);
+		if(driver == null) {
+			try {
+				createDriver(configNode);
+			} catch (CommandException e) {
+				throw new IllegalArgumentException(e);
+			}
+		}
+		return driver;
 	}
 
 	private WebDriver setDriver(WebDriver webDriver) {
