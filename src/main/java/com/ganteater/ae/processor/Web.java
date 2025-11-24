@@ -41,10 +41,14 @@ import org.openqa.selenium.remote.CapabilityType;
 
 import com.ganteater.ae.AEWorkspace;
 import com.ganteater.ae.CommandException;
+import com.ganteater.ae.processor.annotation.CommandDescription;
 import com.ganteater.ae.processor.annotation.CommandExamples;
 import com.ganteater.ae.util.TestCase;
 import com.ganteater.ae.util.xml.easyparser.Node;
 
+@CommandDescription("The Web Processor provides support for commands to interact with web browsers via WebDriver. "
+		+ "This allows you to automate browser interactions, perform web-based testing, "
+		+ "and interact with web elements programmatically as part of your recipes.")
 public class Web extends BaseProcessor {
 
 	private static final String SELECTOR_TARG_LIST = "<xpath>...</xpath><className>...</className><cssSelector>...</cssSelector><id>...</id><linkText>...</linkText><partialLinkText>...</partialLinkText><tagName>...</tagName>";
@@ -86,6 +90,9 @@ public class Web extends BaseProcessor {
 	}
 
 	@Override
+	@CommandExamples({ "<Extern class='Web'>...</Extern>",
+			"<Extern tab='type:string' class='Web'>...</Extern>",
+			"<Extern name='type:string' class='Web' type='enum:chrome|gecko|msedge'>" })
 	public void init(Processor aParent, Node action) throws CommandException {
 		timeout = getTimeout(action);
 		super.init(aParent, action);
