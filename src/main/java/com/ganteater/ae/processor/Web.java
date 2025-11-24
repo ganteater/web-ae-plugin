@@ -66,7 +66,7 @@ public class Web extends BaseProcessor {
 	private String type;
 	private static Map<String, String> windowMap = new HashMap<>();
 
-	public Web() {
+	public Web() throws CommandException {
 		webParrentProcessor = getWebParrentProcessor();
 		if (webParrentProcessor != null) {
 			setDriver(webParrentProcessor.getDriver());
@@ -391,7 +391,7 @@ public class Web extends BaseProcessor {
 	}
 
 	@CommandExamples({ "<Page url='type:url' />", "<Page url='' timeout='type:time' username='' password=''/>" })
-	public void runCommandPage(Node action) {
+	public void runCommandPage(Node action) throws CommandException {
 		String attr = attr(action, "url");
 		getDriver().get(attr);
 		if (checkAuthAllert(action, ALERT_TIMEOUT)) {
@@ -436,7 +436,7 @@ public class Web extends BaseProcessor {
 	}
 
 	@CommandExamples({ "<CloseTab name='type:property'/>", "<CloseTab/>" })
-	public void runCommandCloseTab(Node action) {
+	public void runCommandCloseTab(Node action) throws CommandException {
 		String tabName = attr(action, "name");
 		if (tabName != null) {
 			String tabId = windowMap.get(tabName);
@@ -454,7 +454,7 @@ public class Web extends BaseProcessor {
 	}
 
 	@CommandExamples({ "<Click xpath='type:xpath'/>", "<Click>" + SELECTOR_TARG_LIST + "</Click>" })
-	public void runCommandClick(Node action) {
+	public void runCommandClick(Node action) throws CommandException {
 		Set<String> existedWindowHandles = getDriver().getWindowHandles();
 
 		WebElement element = findElementWithTimeout(action, true);
@@ -500,7 +500,7 @@ public class Web extends BaseProcessor {
 						try {
 							getDriver().switchTo().window(v).close();
 							windowMap.remove(tabName);
-						} catch (NoSuchWindowException e) {
+						} catch (NoSuchWindowException | CommandException e) {
 							windowMap.remove(tabName);
 						}
 						return newTabId;
@@ -512,7 +512,7 @@ public class Web extends BaseProcessor {
 		}
 	}
 
-	private String getTabName(String tabName) {
+	private String getTabName(String tabName) throws CommandException {
 		String tabId = windowMap.get(tabName);
 
 		Set<String> windowHandles = getDriver().getWindowHandles();
@@ -525,7 +525,7 @@ public class Web extends BaseProcessor {
 		return null;
 	}
 
-	private String getCurrentTabName() {
+	private String getCurrentTabName() throws CommandException {
 		String tabId = null;
 		WebDriver driver = getDriver();
 		String windowId = driver.getWindowHandle();
@@ -540,7 +540,7 @@ public class Web extends BaseProcessor {
 		return tabId;
 	}
 
-	private String getNewTabId(Set<String> existedWindowHandles) {
+	private String getNewTabId(Set<String> existedWindowHandles) throws CommandException {
 		String newTabId = null;
 
 		Set<String> windowHandles = getDriver().getWindowHandles();
@@ -654,7 +654,7 @@ public class Web extends BaseProcessor {
 	}
 
 	@CommandExamples({ "<CheckPage url_regex='' title_regex='' timeout='type:ms'/>" })
-	public void runCommandCheckPage(Node action) {
+	public void runCommandCheckPage(Node action) throws CommandException {
 		String urlRegex = attr(action, "url_regex");
 		String titleRegex = attr(action, "title_regex");
 
@@ -738,7 +738,7 @@ public class Web extends BaseProcessor {
 		return result;
 	}
 
-	private WebElement findElement(Node action, boolean inner) throws NoSuchElementException {
+	private WebElement findElement(Node action, boolean inner) throws NoSuchElementException, CommandException {
 		WebElement findElement = null;
 		NoSuchElementException lastException = null;
 		if (inner && !action.isEmpty()) {
@@ -763,7 +763,7 @@ public class Web extends BaseProcessor {
 		return findElement;
 	}
 
-	private WebElement findElementByInnerNode(Node node) throws NoSuchElementException {
+	private WebElement findElementByInnerNode(Node node) throws NoSuchElementException, CommandException {
 		String name = node.getTag();
 		String value = replaceProperties(node.getInnerText());
 		@SuppressWarnings("unchecked")
@@ -772,7 +772,7 @@ public class Web extends BaseProcessor {
 		return findElement(attributes);
 	}
 
-	private WebElement findElement(Map<String, String> attributes) throws NoSuchElementException {
+	private WebElement findElement(Map<String, String> attributes) throws NoSuchElementException, CommandException {
 		WebElement element = null;
 		NoSuchElementException exceptionByMName = null;
 		String attr = attributes.get("name");
@@ -821,7 +821,7 @@ public class Web extends BaseProcessor {
 	}
 
 	@CommandExamples("<Title name='' />")
-	public void runCommandTitle(Node action) {
+	public void runCommandTitle(Node action) throws CommandException {
 		WebDriver driver = getDriver();
 		if (driver != null) {
 			setVariableValue(attr(action, "name"), driver.getTitle());
@@ -833,20 +833,20 @@ public class Web extends BaseProcessor {
 	}
 
 	@CommandExamples("<Refresh />")
-	public void runCommandRefresh(Node action) {
+	public void runCommandRefresh(Node action) throws CommandException {
 		WebDriver driver = getDriver();
 		driver.navigate().refresh();
 		updateTabTitle();
 	}
 
 	@CommandExamples({ "<CloseDriver />" })
-	public void runCommandCloseDriver(Node action) {
+	public void runCommandCloseDriver(Node action) throws CommandException {
 		quiteDriver();
 	}
 
 	@SuppressWarnings("unchecked")
 	@CommandExamples({ "<DeleteCookie except='type:property'/>", "<DeleteCookie />", "<DeleteCookie name=''/>" })
-	public void runCommandDeleteCookie(Node action) {
+	public void runCommandDeleteCookie(Node action) throws CommandException {
 		Object except = attrValue(action, "except");
 		WebDriver driver = getDriver();
 		Options manage = driver.manage();
@@ -900,7 +900,7 @@ public class Web extends BaseProcessor {
 
 	@SuppressWarnings("unchecked")
 	@CommandExamples({ "<CookieReport name='type:property'/>" })
-	public void runCommandCookieReport(Node action) {
+	public void runCommandCookieReport(Node action) throws CommandException {
 		String name = attr(action, "name");
 		Map<String, String> report = (Map<String, String>) getVariableValue(name);
 		if (report == null) {
@@ -922,7 +922,7 @@ public class Web extends BaseProcessor {
 		updateTabTitle();
 	}
 
-	private void quiteDriver() {
+	private void quiteDriver() throws CommandException {
 		if (getDriver() != null) {
 			try {
 				getDriver().quit();
@@ -933,14 +933,10 @@ public class Web extends BaseProcessor {
 		}
 	}
 
-	private WebDriver getDriver() {
+	private WebDriver getDriver() throws CommandException {
 		WebDriver driver = WebDriverManager.getDriver(driverName);
-		if(driver == null) {
-			try {
-				createDriver(configNode);
-			} catch (CommandException e) {
-				throw new IllegalArgumentException(e);
-			}
+		if (driver == null) {
+			createDriver(configNode);
 		}
 		return driver;
 	}
