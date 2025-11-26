@@ -7,11 +7,12 @@
 	<parent>
 		<groupId>com.ganteater.plugins</groupId>
 		<artifactId>ae-plugins</artifactId>
-		<version>1.2.8</version>
+		<version>1.2.9-SNAPSHOT</version>
 		<relativePath></relativePath>
 	</parent>
 
 	<artifactId>web-ae-plugin</artifactId>
+	
 	<name>Web Anteater Plugin</name>
 	<description>A plugin for Anteater featuring Selenium-based web page manipulation, Jsoup-based HTML document parsing.</description>
 	<url>https://github.com/ganteater/web-ae-plugin</url>

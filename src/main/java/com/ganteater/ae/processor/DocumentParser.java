@@ -36,6 +36,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.ganteater.ae.processor.annotation.CommandDescription;
 import com.ganteater.ae.processor.annotation.CommandExamples;
 import com.ganteater.ae.util.xml.easyparser.EasyParser;
 import com.ganteater.ae.util.xml.easyparser.Node;
@@ -62,6 +63,8 @@ public class DocumentParser extends BaseProcessor {
 	}
 
 	@SuppressWarnings("unchecked")
+	@CommandDescription("The \"Extract\" command utilizes an XML parser, requiring the root element in"
+			+ " the processed text to be well-formed to ensure proper functionality..")
 	@CommandExamples({ "<Extract name='type:property' source='type:property' xpath='type:string' />",
 			"<Extract name='type:property' source='type:property' selector='type:string' />" })
 	public void runCommandExtract(final Node aCurrentAction)
@@ -167,8 +170,9 @@ public class DocumentParser extends BaseProcessor {
 		return theValue;
 	}
 
-	@CommandExamples({ "<PageParser url='type:url'><select name='type:property'>...jsop_select...</select></PageParser>",
-		"<PageParser url='type:url' timeout='type:ms'><select name='type:property'>...jsop_select...</select></PageParser>"})
+	@CommandExamples({
+			"<PageParser url='type:url'><select name='type:property'>...jsop_select...</select></PageParser>",
+			"<PageParser url='type:url' timeout='type:ms'><select name='type:property'>...jsop_select...</select></PageParser>" })
 	public void runCommandPageParser(Node action) throws IOException {
 		String url = attr(action, "url");
 		int timeout = (int) parseTime(action, "timeout", "2000");
