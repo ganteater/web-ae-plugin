@@ -24,6 +24,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.SessionNotCreatedException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.WebDriver.Window;
@@ -48,7 +49,10 @@ import com.ganteater.ae.util.xml.easyparser.Node;
 
 @CommandDescription("The Web Processor provides support for commands to interact with web browsers via WebDriver. "
 		+ "This allows you to automate browser interactions, perform web-based testing, "
-		+ "and interact with web elements programmatically as part of your recipes.")
+		+ "and interact with web elements programmatically as part of your recipes.\n\n"
+		+ "The web processor supports the use of non-text keystroke codes defined in the numbering system at "
+		+ "https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/Keys.html. You can use them via "
+		+ "a variable, for example, $var{\\CONTROL+v} will insert the simultaneous press of two keys: Ctrl+v.")
 public class Web extends BaseProcessor {
 
 	private static final String SELECTOR_TARG_LIST = "<xpath>...</xpath><className>...</className><cssSelector>...</cssSelector><id>...</id><linkText>...</linkText><partialLinkText>...</partialLinkText><tagName>...</tagName>";
@@ -415,7 +419,6 @@ public class Web extends BaseProcessor {
 			WebElement element = findElementWithTimeout(action, true);
 
 			String text = attr(action, "value");
-
 			if (element != null) {
 				clearElement(element);
 				element.sendKeys(text);
@@ -469,6 +472,7 @@ public class Web extends BaseProcessor {
 			WebDriverException exception = null;
 			for (long i = 0; i < getTimeout(action) && !isStoppedTest(); i += SLEEP_INTERVAL) {
 				try {
+					element = findElementWithTimeout(action, true);
 					element.click();
 					exception = null;
 					break;
@@ -566,7 +570,25 @@ public class Web extends BaseProcessor {
 			WebElement element = findElementWithTimeout(action, true);
 			String text = "";
 			if (element != null) {
-				String tagName = element.getTagName();
+				String tagName = null;
+				Exception exception = null;
+				long timeout = getTimeout(action);
+				for (long i = 0; i < timeout && !isStoppedTest(); i += SLEEP_INTERVAL) {
+					try {
+						element = findElementWithTimeout(action, true);
+						tagName = element.getTagName();
+						exception = null;
+						break;
+					} catch (Exception e) {
+						exception = e;
+					}
+					sleep(SLEEP_INTERVAL);
+				}
+
+				if (exception != null) {
+					throw exception;
+				}
+
 				if ("input".equals(tagName)) {
 					text = element.getAttribute("value");
 				} else {
@@ -952,4 +974,24 @@ public class Web extends BaseProcessor {
 		return WebDriverManager.setDriver(driverName, webDriver);
 	}
 
+	@Override
+	protected String specialVariableParsing(String nameProperty) {
+		String result = null;
+		String[] split = StringUtils.split(nameProperty, "+");
+		if (split.length > 1) {
+			List<CharSequence> chords = new ArrayList<>();
+			for (int i = 0; i < split.length; i++) {
+				String name = StringUtils.substringAfter(split[i], "\\");
+				try {
+					chords.add(Keys.valueOf(name));
+				} catch (Exception e) {
+					chords.add(super.specialVariableParsing(split[i]));
+				}
+			}
+			result = Keys.chord(chords);
+		} else {
+			result = super.specialVariableParsing(nameProperty);
+		}
+		return result;
+	}
 }
