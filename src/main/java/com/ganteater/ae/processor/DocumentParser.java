@@ -175,7 +175,7 @@ public class DocumentParser extends BaseProcessor {
 			"<PageParser url='type:url' timeout='type:ms'><select name='type:property'>...jsop_select...</select></PageParser>" })
 	public void runCommandPageParser(Node action) throws IOException {
 		String url = attr(action, "url");
-		int timeout = (int) parseTime(action, "timeout", "2000");
+		int timeout = (int) attrTime(action, "timeout", "2000");
 		Connection connect = Jsoup.connect(url)
 				.userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
 				.referrer(url).timeout(timeout);

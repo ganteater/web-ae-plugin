@@ -299,7 +299,7 @@ public class Web extends BaseProcessor {
 		}
 
 		File homeWorkingDir = new File(AEWorkspace.getInstance().getHomeWorkingDir(), PLUGINS_DIR_NAME);
-		File baseDir = new File(AEWorkspace.getInstance().getBaseDir(), PLUGINS_DIR_NAME);
+		File baseDir = new File(AEWorkspace.getInstance().getWorkingDir(), PLUGINS_DIR_NAME);
 		throw new CommandException("Web driver not found.\n\n"
 				+ "If you know the path to the already loaded web driver, you can use the anteater environment variable: WEBDRIVER_PATH.\n"
 				+ "If you don't have the web driver, you can download it in the following folders:\n"
@@ -759,7 +759,7 @@ public class Web extends BaseProcessor {
 
 	private long getTimeout(Node action) {
 		long result = this.timeout;
-		int timeout = (int) parseTime(action, "timeout", "0");
+		int timeout = (int) attrTime(action, "timeout", "0");
 		if (timeout > 0) {
 			result = timeout;
 		}
