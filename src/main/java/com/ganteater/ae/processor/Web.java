@@ -200,6 +200,10 @@ public class Web extends BaseProcessor {
 
 			File startDir;
 			String driverPath = replaceProperties((String) getVariableValue("WEBDRIVER_PATH"));
+			if (".".equals(driverPath)) {
+				driverPath = SystemUtils.getUserDir().getAbsolutePath();
+			}
+
 			if (driverPath == null) {
 				startDir = new File(getListener().getManager().getFile(PLUGINS_DIR_NAME), driverFileName);
 				if (!startDir.exists()) {
@@ -209,7 +213,7 @@ public class Web extends BaseProcessor {
 			} else {
 				startDir = new File(driverPath, driverFileName);
 			}
-			
+
 			if (!startDir.exists()) {
 				showDriverNotFound(driverType);
 			} else {
