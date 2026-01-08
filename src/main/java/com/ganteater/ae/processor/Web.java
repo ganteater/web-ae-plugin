@@ -211,6 +211,8 @@ public class Web extends BaseProcessor {
 				} else {
 					absolutePath = startDir.getAbsolutePath();
 				}
+			} else {
+				absolutePath = driverPath;
 			}
 
 			debug("Web driver: " + absolutePath);
