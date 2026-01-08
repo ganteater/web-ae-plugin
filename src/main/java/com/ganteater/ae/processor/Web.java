@@ -93,8 +93,7 @@ public class Web extends BaseProcessor {
 	}
 
 	@Override
-	@CommandExamples({ "<Extern class='Web'>...</Extern>",
-			"<Extern tab='type:string' class='Web'>...</Extern>",
+	@CommandExamples({ "<Extern class='Web'>...</Extern>", "<Extern tab='type:string' class='Web'>...</Extern>",
 			"<Extern name='type:string' class='Web' type='enum:chrome|gecko|msedge'>" })
 	public void init(Processor aParent, Node action) throws CommandException {
 		timeout = getTimeout(action);
@@ -190,7 +189,6 @@ public class Web extends BaseProcessor {
 		String absolutePath = null;
 		String driverType = getType(action);
 		try {
-			String driverPath = replaceProperties((String) getVariableValue("WEBDRIVER_PATH"));
 
 			String driverFileName = null;
 			if (SystemUtils.IS_OS_MAC) {
@@ -200,19 +198,22 @@ public class Web extends BaseProcessor {
 				driverFileName = driverType + "driver.exe";
 			}
 
+			File startDir;
+			String driverPath = replaceProperties((String) getVariableValue("WEBDRIVER_PATH"));
 			if (driverPath == null) {
-				File startDir = new File(getListener().getManager().getFile(PLUGINS_DIR_NAME), driverFileName);
+				startDir = new File(getListener().getManager().getFile(PLUGINS_DIR_NAME), driverFileName);
 				if (!startDir.exists()) {
 					File homePluginsDir = new File(getListener().getManager().getHomeWorkingDir(), PLUGINS_DIR_NAME);
 					startDir = new File(homePluginsDir, driverFileName);
 				}
-				if (!startDir.exists()) {
-					showDriverNotFound(driverType);
-				} else {
-					absolutePath = startDir.getAbsolutePath();
-				}
 			} else {
-				absolutePath = driverPath;
+				startDir = new File(driverPath, driverFileName);
+			}
+			
+			if (!startDir.exists()) {
+				showDriverNotFound(driverType);
+			} else {
+				absolutePath = startDir.getAbsolutePath();
 			}
 
 			debug("Web driver: " + absolutePath);
