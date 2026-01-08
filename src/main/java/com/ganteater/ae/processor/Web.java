@@ -652,7 +652,7 @@ public class Web extends BaseProcessor {
 		updateTabTitle();
 	}
 
-	@CommandExamples({ "<ElementExists xpath=''>...</ElementExists>" })
+	@CommandExamples({ "<ElementExists xpath='type:xpath'>...</ElementExists>" })
 	public void runCommandElementExists(Node action) throws CommandException {
 		try {
 			findElementWithTimeout(action, false);
@@ -665,7 +665,7 @@ public class Web extends BaseProcessor {
 		updateTabTitle();
 	}
 
-	@CommandExamples({ "<ElementNotExists xpath=''>...</ElementNotExists>" })
+	@CommandExamples({ "<ElementNotExists xpath='type:xpath'>...</ElementNotExists>" })
 	public void runCommandElementNotExists(Node action) throws CommandException {
 		try {
 			findElementWithTimeout(action, false);
@@ -965,6 +965,7 @@ public class Web extends BaseProcessor {
 		WebDriver driver = WebDriverManager.getDriver(driverName);
 		if (driver == null) {
 			createDriver(configNode);
+			driver = getDriver();
 		}
 		return driver;
 	}
