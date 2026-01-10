@@ -307,12 +307,18 @@ public class Web extends BaseProcessor {
 
 		File homeWorkingDir = new File(AEWorkspace.getInstance().getHomeWorkingDir(), PLUGINS_DIR_NAME);
 		File baseDir = new File(AEWorkspace.getInstance().getWorkingDir(), PLUGINS_DIR_NAME);
-		throw new CommandException("Web driver not found.\n\n"
-				+ "If you know the path to the already loaded web driver, you can use the anteater environment variable: WEBDRIVER_PATH.\n"
-				+ "If you don't have the web driver, you can download it in the following folders:\n"
-				+ "BaseDir: \"file:" + baseDir + "\"\n" + "or HomeDir: \"file:" + homeWorkingDir + "\"\n"
-				+ "\nWebdriwer download page: \"" + downloadPage + "\"\n"
-				+ "After installing the web driver, an application restart is required.", this);
+
+		String driverPath = replaceProperties((String) getVariableValue("WEBDRIVER_PATH"));
+
+		String message = driverPath != null ? "Web driver not found. WEBDRIVER_PATH: `" + driverPath + "`"
+				: "Web driver not found.\n\n"
+						+ "If you know the path to the already loaded web driver, you can use the anteater environment variable: WEBDRIVER_PATH.\n"
+						+ "If you don't have the web driver, you can download it in the following folders:\n"
+						+ "BaseDir: \"file:" + baseDir + "\"\n" + "or HomeDir: \"file:" + homeWorkingDir + "\"\n"
+						+ "\nWebdriwer download page: \"" + downloadPage + "\"\n"
+						+ "After installing the web driver, an application restart is required.";
+
+		throw new CommandException(message, this);
 	}
 
 	private String getDriverClassName(Node action) {
